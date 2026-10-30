@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Office Configurator</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js", "three/addons/": "./vendor/" } }</script>
+</head>
+<body>
+  <header class="bar">
+    <h1>Office Configurator</h1>
+    <div class="seg" role="group" aria-label="View" id="view-switch">
+      <button type="button" data-view="split" data-testid="view-split">Split</button>
+      <button type="button" data-view="3d" data-testid="view-3d">3D</button>
+      <button type="button" data-view="plan" data-testid="view-plan">Plan</button>
+    </div>
+    <label class="toggle"><input type="checkbox" id="show-zones" data-testid="show-zones"> Clearances</label>
+  </header>
+  <main class="app">
+    <aside id="side" aria-label="Settings"></aside>
+    <section id="views" class="views split">
+      <div id="plan-pane" class="pane"><svg id="plan" data-testid="plan" xmlns="http://www.w3.org/2000/svg"></svg></div>
+      <div id="three-pane" class="pane" data-testid="three"></div>
+    </section>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

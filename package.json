@@ -1,0 +1,1 @@
+{"name":"office-configurator","private":true,"type":"module","scripts":{"check":"node tools/check.js","browser":"node tools/browser_check.js"}}

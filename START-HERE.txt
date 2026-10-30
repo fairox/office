@@ -1,0 +1,45 @@
+OFFICE CONFIGURATOR
+===================
+
+Lay out a single office room (desks along the walls, a meeting table, phone
+booths) in your browser, with a 3D view, a dimensioned plan and checks.
+
+1. INSTALL
+   You need Python 3.8 or newer. Nothing else.
+   - Windows: https://www.python.org/downloads/windows/
+     In the installer, tick "Add python.exe to PATH".
+   - macOS:   https://www.python.org/downloads/macos/
+   - Linux:   usually installed already; otherwise  sudo apt install python3
+
+2. START
+   - Windows: double-click  "Start Office Configurator.bat"
+   - macOS:   double-click  "Start Office Configurator.command"
+              (first time: right-click > Open, because it was downloaded)
+   - Linux:   run  ./start.sh
+   Your browser opens the configurator. Keep the small window that appears
+   open while you work; close it (or press Ctrl+C in it) to stop.
+
+3. USE
+   - Pick a preset, then type the room size and openings in exact mm.
+     Each opening is measured from a corner you choose; switching the corner
+     converts the number and leaves the opening where it is.
+   - Press "Fix site" once the room matches your drawing. After that, presets
+     and strategies only change the furniture, never the room or its openings.
+   - The Checks list says what did not fit and by how much. Nothing is dropped
+     without a message there.
+   - Your work is saved in the browser and in the page address: copy the
+     address to send someone exactly what you see.
+
+4. BUILD IN ARCHICAD
+   Not in this version yet (phase 2: build file, "Build in Archicad" window,
+   Test placement).
+
+TROUBLESHOOTING
+   - "Python was not found" / the Microsoft Store opens: Windows is using its
+     placeholder alias. Install Python from python.org (step 1), or switch the
+     alias off: Settings > Apps > Advanced app settings > App execution aliases.
+   - The browser does not open: copy the address shown in the small window
+     (http://127.0.0.1:8765/ or the next free port) into your browser.
+   - The 3D view says it is unavailable: your browser has WebGL switched off.
+     The plan and checks still work.
+   - Start again from scratch: choose a preset with the site released.
