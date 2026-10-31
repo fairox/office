@@ -9,12 +9,13 @@ honest checks. Archicad building is planned as a later phase. Users should read
 | Phase | Scope | State |
 |---|---|---|
 | 1 | S tier: rectangular room, fixed site, openings editor, desks along walls + meeting table + booths, 3D + plan + checks, URL/localStorage state | **done** |
-| 2 | Build file, `OfficeBuild.py` window, mock Archicad, Replace/Remove | not started |
+| 2 | Build file, `OfficeBuild.py` window, mock Archicad, Replace/Remove | **done against the mock**; waiting for the first real Test placement |
 | 3 | M tier: polygons, columns, core, room spine, aisles, pinned rooms | not started |
 | 4 | L tier: multiple cores, instancing, batch building | not started |
 | 5 | Library objects, multiple floors, IFC classification | not started |
 
-The spec sections we have are in [docs/SPEC.md](docs/SPEC.md). Sections 1–9 are missing.
+The spec sections we have are in [docs/SPEC.md](docs/SPEC.md). Sections 1–7 and the start of 8 are missing.
+The Archicad side, and what is verified against what: [docs/ARCHICAD.md](docs/ARCHICAD.md).
 Reference drawings and what was taken from them: [docs/REFERENCES.md](docs/REFERENCES.md).
 
 ## Layout
@@ -29,6 +30,13 @@ web/view3d.js            three.js view (vendored r170 in web/vendor/)
 tools/check.js           geometry checker: presets x tiers x strategies + stress + regressions
 tools/browser_check.js   Playwright: drives the UI, screenshots every preset/view
 tools/package.py         dist/office-configurator-<date>-<commit>.zip from HEAD
+web/buildfile.js         the build file (office-configurator-build v1) for the Archicad side
+archicad/build_office.py Archicad side: validation, build, journal, verify, Replace/Remove, CLI
+archicad/office_gui.py   the Build in Archicad window
+archicad/OfficeBuild.py  GENERATED single file for Tapir's script palette (tools/bundle_tapir_script.py)
+tools/mock_archicad.py   mock Archicad + Tapir, checked against tools/tapir/<version>.json
+tools/archicad_check.py  safety flow against the mock
+tools/gui_check.py       drives the window under Xvfb, screenshots
 ```
 
 ## Checks
@@ -39,6 +47,18 @@ node tools/check.js
 
 ```bash
 node tools/browser_check.js
+```
+
+```bash
+python3 tools/archicad_check.py
+```
+
+```bash
+xvfb-run -a -s "-screen 0 1280x1000x24" "$(uv python find --managed-python 3.12)" tools/gui_check.py
+```
+
+```bash
+python3 tools/bundle_tapir_script.py
 ```
 
 ```bash

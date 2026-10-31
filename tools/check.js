@@ -5,6 +5,7 @@
 //   node tools/check.js --verbose  also print each case's readouts
 import { generate, STRATEGIES, TIERS, STANDARDS } from '../web/generator.js';
 import { PRESETS, presetState } from '../web/presets.js';
+import { buildFile, LAYERS } from '../web/buildfile.js';
 
 const verbose = process.argv.includes('--verbose');
 const EPS = 0.5;
@@ -233,7 +234,8 @@ for (const [name, [state, opts]] of Object.entries(stress)) {
   for (const strategy of Object.keys(STRATEGIES)) {
     const st = clone(state);
     if (STRATEGIES[st.strategy] || st.strategy === 'daylight') st.strategy = strategy;
-    sites.push(JSON.stringify(runCase(`${name}/${strategy}`, st, opts || {}).site));
+    // stress rooms may be large; presets keep the 2 s interactive budget
+    sites.push(JSON.stringify(runCase(`${name}/${strategy}`, st, { maxMs: 4000, ...(opts || {}) }).site));
   }
   expect(name, sites.every((s) => s === sites[0]), 'fixed site differs between strategies');
 }
@@ -272,6 +274,43 @@ console.log('Regressions');
     expect(`reg: ${key} benches`, L.elements.some((e) => e.kind === 'desk' && e.bench), 'no bench desks');
   }
   cases++;
+}
+
+// ---------- build files ----------
+console.log('Build files');
+for (const key of Object.keys(PRESETS)) {
+  const name = `build/${key}`;
+  const st = presetState(key);
+  const L = generate(st);
+  const B = buildFile(st, L, { name: key, created: '2026-10-31T00:00:00.000Z' });
+  cases++;
+  expect(name, B.format === 'office-configurator-build' && B.version === 1, 'format/version');
+  const bad = allNumbers(B, 'build', []).filter((p) => !p.includes('areaPerWorkpoint'));
+  expect(name, bad.length === 0, `non-finite numbers ${bad.slice(0, 3)}`);
+  const M = B.model, W = M.site.width, D = M.site.depth, t = M.site.wallThickness, keys = new Set();
+  for (const k of [...M.walls, ...M.openings, ...M.zones, ...M.boxes, ...M.beams].map((x) => x.key)) {
+    expect(name, !keys.has(k), `duplicate key ${k}`);
+    keys.add(k);
+    expect(name, /^[A-Z0-9-]{1,40}$/.test(k), `key ${k} is not a safe Element ID part`);
+  }
+  for (const b of M.boxes) {
+    expect(name, b.min[0] >= -1e-6 && b.min[1] >= -1e-6 && b.min[0] + b.size[0] <= W + 1e-6 && b.min[1] + b.size[1] <= D + 1e-6, `${b.key} outside the site`);
+    expect(name, b.size.every((v) => v > 0), `${b.key} has an empty size`);
+    expect(name, Object.values(LAYERS).includes(b.layer), `${b.key} layer ${b.layer}`);
+    expect(name, /^#[0-9a-f]{6}$/.test(b.color), `${b.key} colour ${b.color}`);
+  }
+  for (const o of M.openings) {
+    const w = M.walls.find((x) => x.key === o.wall);
+    expect(name, !!w, `${o.key} host ${o.wall} missing`);
+    if (w) expect(name, o.centerOffset - o.width / 2 >= t / 2 - 1e-6 && o.centerOffset + o.width / 2 <= w.length - t / 2 + 1e-6, `${o.key} centre offset ${o.centerOffset} outside ${w.key}`);
+  }
+  // the parts add up to the elements
+  const parts = (kind, n) => M.boxes.filter((b) => b.kind === kind).length === n;
+  expect(name, parts('desk', 3 * L.readouts.desksPlaced), 'desk parts');
+  expect(name, parts('chair', 2 * L.elements.filter((e) => e.kind === 'chair').length), 'chair parts');
+  expect(name, parts('booth', 2 * L.readouts.boothsPlaced), 'booth parts');
+  expect(name, M.walls.length === 4 && B.walls === true, 'four site walls');
+  expect(name, M.zones.length === 1 && Math.abs(M.zones[0].polygon[2][0] - W) < 1e-9, 'zone polygon');
 }
 
 console.log(`\n${cases} cases, ${assertions} assertions, ${failures} failure(s)`);

@@ -3,7 +3,7 @@
 // Fails on any page error or console error.
 import { createRequire } from 'node:module';
 import { spawn } from 'node:child_process';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -31,7 +31,7 @@ function startServer() {
 
 const { proc, url } = await startServer();
 const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
-const context = await browser.newContext({ viewport: { width: 1500, height: 900 } });
+const context = await browser.newContext({ viewport: { width: 1500, height: 900 }, acceptDownloads: true });
 const page = await context.newPage();
 const errors = [];
 page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
@@ -158,6 +158,31 @@ try {
   ok(L.elements.some((e) => e.kind === 'table' && e.shape === 'round'), 'choosing round gives a round table');
   ok(await page.locator('#plan circle[data-kind="table"]').count() === 1, 'round table drawn as a circle');
   await page.screenshot({ path: path.join(SHOTS, 'team8-benches-round.png') });
+
+  // build file download
+  console.log('Build file');
+  await setField('preset', 'team8');
+  await setField('name', 'Team room North');
+  const [dl] = await Promise.all([page.waitForEvent('download'), page.click('[data-testid="download"]')]);
+  ok(dl.suggestedFilename() === 'team-room-north.office-build.json', `download name ${dl.suggestedFilename()}`);
+  const bf = JSON.parse(readFileSync(await dl.path(), 'utf8'));
+  ok(bf.format === 'office-configurator-build' && bf.version === 1 && bf.name === 'Team room North', 'downloaded build file format and name');
+  ok(bf.model.boxes.length > 40 && bf.model.walls.length === 4 && bf.walls === true, 'downloaded build file has the model');
+
+  // a Zone handed over by the Build in Archicad window becomes a fixed site
+  const zone = Buffer.from(JSON.stringify({ name: 'Studio North', width: 9, depth: 6.6, origin: [20, 4, 0], rotationDeg: 15, story: 1 })).toString('base64url');
+  await page.goto(`${url}#zone=${zone}`);
+  await page.waitForFunction(() => window.__layout);
+  L = await layout();
+  ok(L.site.width === 9000 && L.site.depth === 6600, `zone size taken over: ${L.site.width} x ${L.site.depth}`);
+  ok(await page.locator('[data-testid="fixed-badge"]').isVisible(), 'zone site is fixed');
+  ok(await page.locator('[data-testid="zone-note"]').isVisible(), 'zone note shown');
+  ok(!page.url().includes('#zone='), 'zone hash replaced by the saved state');
+  const [dl2] = await Promise.all([page.waitForEvent('download'), page.click('[data-testid="download"]')]);
+  const bf2 = JSON.parse(readFileSync(await dl2.path(), 'utf8'));
+  ok(bf2.walls === false && bf2.placement.rotationDeg === 15 && bf2.placement.story === 1 && bf2.placement.origin[0] === 20, 'zone build file: no site walls, zone placement');
+  await page.screenshot({ path: path.join(SHOTS, 'zone-handover.png') });
+  await page.click('[data-testid="toggle-fix"]');
 
   // clearances on, for the screenshot set
   await setField('preset', 'team8');

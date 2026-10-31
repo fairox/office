@@ -33,8 +33,24 @@ benches, a meeting table, phone booths) in your browser, with a 3D view, a dimen
      address to send someone exactly what you see.
 
 4. BUILD IN ARCHICAD
-   Not in this version yet (phase 2: build file, "Build in Archicad" window,
-   Test placement).
+   You need Archicad with the Tapir add-on (1.7.x), and Python with Tkinter
+   (the python.org installer includes it).
+   - In the web app, press "Download build file".
+   - Open the Build in Archicad window: in Tapir's script palette run
+     archicad/OfficeBuild.py, or double-click "Build in Archicad.bat"
+     (Windows) / "Build in Archicad.command" (macOS).
+   - The newest build file in your Downloads folder is loaded by itself.
+     Pick the project if several Archicads are open; nothing is guessed.
+   - FIRST TIME: press "Test placement". It builds one sample of every kind,
+     checks each one, and deletes them again. Building is unlocked only
+     after it passes.
+   - Press "Build in Archicad". Everything lands on OFFICE layers with an
+     Element ID OF-<run>-<name>, and every element is checked afterwards.
+   - Building again replaces the previous build, but only elements that are
+     still exactly as built; anything you moved or changed is kept.
+   - "From selected Zone": select a rectangular Zone in Archicad first; the
+     window places the design there and "Open web app" designs for that room.
+   - Every run is logged in Documents/Office Configurator/journal.
 
 TROUBLESHOOTING
    - "Python was not found" / the Microsoft Store opens: Windows is using its
@@ -45,3 +61,9 @@ TROUBLESHOOTING
    - The 3D view says it is unavailable: your browser has WebGL switched off.
      The plan and checks still work.
    - Start again from scratch: choose a preset with the site released.
+   - "Several Archicads are open": pick the project in the window's Project
+     list. The window never chooses for you.
+   - "Run Test placement first": this Tapir version has not been tested on
+     this computer yet. Test placement builds and deletes a few samples.
+   - A build stopped half way: choose "Remove run ... only" and that run.
+     Only elements still exactly as built are deleted.

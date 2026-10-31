@@ -10,6 +10,7 @@ Needs Python 3.8+ and nothing else.
 import argparse
 import functools
 import http.server
+import json
 import os
 import socket
 import sys
@@ -40,6 +41,20 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         super().log_message(fmt, *args)
 
 
+def record_location(url):
+    """Tell the Build in Archicad window where the app lives (Documents/Office Configurator/app.json)."""
+    base = os.environ.get("OFFICE_CONFIGURATOR_HOME")
+    if not base:
+        docs = os.path.join(os.path.expanduser("~"), "Documents")
+        base = os.path.join(docs if os.path.isdir(docs) else os.path.expanduser("~"), "Office Configurator")
+    try:
+        os.makedirs(base, exist_ok=True)
+        with open(os.path.join(base, "app.json"), "w", encoding="utf-8") as f:
+            json.dump({"root": os.path.dirname(os.path.abspath(__file__)), "url": url, "pid": os.getpid()}, f)
+    except OSError:
+        pass
+
+
 def free_port(start):
     for port in range(start, start + 50):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -62,6 +77,7 @@ def main():
     port = free_port(args.port)
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), functools.partial(Handler, directory=ROOT))
     url = f"http://127.0.0.1:{port}/"
+    record_location(url)
     print(f"Office Configurator running at {url}")
     print("Leave this window open while you work. Press Ctrl+C to stop.", flush=True)
     if args.open:

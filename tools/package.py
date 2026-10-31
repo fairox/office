@@ -21,30 +21,21 @@ for stream in (sys.stdout, sys.stderr):
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PREFIX = "office-configurator/"
 EXECUTABLE_SUFFIXES = (".sh", ".command")
-EXECUTABLE_FILES = {"serve.py", "tools/package.py"}
-# Tapir add-on bundle shipped with the Archicad side (phase 2). Refuse to package a stale one.
-TAPIR_DIR = "archicad/tapir/"
-TAPIR_STAMP = "archicad/tapir/BUNDLE_SOURCE"
+EXECUTABLE_FILES = {"serve.py", "tools/package.py", "archicad/OfficeBuild.py", "archicad/build_office.py"}
+# The single-file script for Tapir's palette must match the sources it is generated from.
+BUNDLE = "archicad/OfficeBuild.py"
+BUNDLE_SOURCES = ("archicad/build_office.py", "archicad/office_gui.py")
 
 
-def git(*args, binary=False):
-    out = subprocess.check_output(["git", *args], cwd=ROOT)
-    return out if binary else out.decode("utf-8")
-
-
-def check_tapir(files):
-    bundle = [f for f in files if f.startswith(TAPIR_DIR)]
-    if not bundle:
-        return "no Tapir bundle in this phase"
-    if TAPIR_STAMP not in files:
-        raise SystemExit(f"Refusing to package: {TAPIR_DIR} has no {os.path.basename(TAPIR_STAMP)} stamp.")
-    # The stamp names the commit of the scripts the bundle was built from; they must not have changed since.
-    stamp = git("show", f"HEAD:{TAPIR_STAMP}").strip()
-    changed = git("diff", "--name-only", stamp, "HEAD", "--", "archicad/").split()
-    changed = [f for f in changed if not f.startswith(TAPIR_DIR)]
-    if changed:
-        raise SystemExit("Refusing to package: the Tapir bundle is stale. Changed since it was built:\n  " + "\n  ".join(changed))
-    return f"Tapir bundle current (built from {stamp[:8]})"
+def check_bundle(files):
+    if BUNDLE not in files:
+        raise SystemExit(f"Refusing to package: {BUNDLE} is not committed.")
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    from bundle_tapir_script import bundle
+    lib, gui = (git("show", f"HEAD:{p}") for p in BUNDLE_SOURCES)
+    if bundle(lib, gui) != git("show", f"HEAD:{BUNDLE}"):
+        raise SystemExit(f"Refusing to package: {BUNDLE} is stale. Run python3 tools/bundle_tapir_script.py and commit.")
+    return f"{BUNDLE} matches its sources"
 
 
 def main():
@@ -59,7 +50,7 @@ def main():
         mode = meta.split()[0]
         entries.append((path, mode))
     files = [p for p, _ in entries]
-    tapir = check_tapir(files)
+    tapir = check_bundle(files)
 
     os.makedirs(os.path.join(ROOT, "dist"), exist_ok=True)
     out = os.path.join(ROOT, "dist", f"office-configurator-{when:%Y%m%d}-{commit}.zip")

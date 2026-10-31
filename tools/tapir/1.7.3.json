@@ -1,0 +1,5703 @@
+{
+ "commands": {
+  "CreateBeams": {
+   "inputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "beamsData": {
+      "items": {
+       "additionalProperties": false,
+       "properties": {
+        "anchorPoint": {
+         "$ref": "#/BeamAnchorPoint"
+        },
+        "arcAngle": {
+         "description": "Optional arc angle in radians. A non-zero value makes a horizontally curved beam.",
+         "type": "number"
+        },
+        "begCoordinate": {
+         "$ref": "#/Coordinate2D"
+        },
+        "buildingMaterialId": {
+         "$ref": "#/AttributeId",
+         "description": "Cross section building material (round or rectangular, per circleBased). Applied to all segments."
+        },
+        "circleBased": {
+         "description": "True for a round beam cross section, false for rectangular. Ignored if profileId is also given. Applied to all segments.",
+         "type": "boolean"
+        },
+        "endCoordinate": {
+         "$ref": "#/Coordinate2D"
+        },
+        "favoriteName": {
+         "description": "Optional name of a favorite to base the new element on. Its settings are applied first, then the explicitly given fields override them.",
+         "type": "string"
+        },
+        "floorIndex": {
+         "description": "Optional floor index. If omitted, derived from zCoordinate.",
+         "type": "integer"
+        },
+        "height": {
+         "description": "Cross section height of the beam. Applied to all segments.",
+         "exclusiveMinimum": 0.0,
+         "type": "number"
+        },
+        "id": {
+         "description": "Optional Element ID of the new element (the ID field of the Settings dialog, shown in schedules and labels; the same string GetDetailsOfElements returns as id). When omitted the element gets the next automatic ID of its tool.",
+         "type": "string"
+        },
+        "isSlanted": {
+         "description": "Optional explicit slanted state. By default it is derived from slantAngle.",
+         "type": "boolean"
+        },
+        "isWidthAndHeightLinked": {
+         "description": "When true (the default), Archicad keeps width and height equal and setting one changes the other - set to false to give width/height independent values. Applied to all segments.",
+         "type": "boolean"
+        },
+        "offset": {
+         "type": "number"
+        },
+        "profileAngle": {
+         "description": "Rotation angle of the profile around the beam's center line, in radians.",
+         "type": "number"
+        },
+        "profileId": {
+         "$ref": "#/AttributeId",
+         "description": "Switches the cross section to this custom extruded profile (circleBased becomes false). Applied to all segments."
+        },
+        "slantAngle": {
+         "description": "Slant angle in radians. A non-zero value also switches the beam to slanted, unless isSlanted is given explicitly.",
+         "type": "number"
+        },
+        "verticalCurveHeight": {
+         "description": "Optional rise of a vertically curved beam. A non-zero value makes a vertically curved beam; it wins over arcAngle.",
+         "type": "number"
+        },
+        "width": {
+         "description": "Cross section width of the beam. Applied to all segments.",
+         "exclusiveMinimum": 0.0,
+         "type": "number"
+        },
+        "zCoordinate": {
+         "type": "number"
+        }
+       },
+       "required": [
+        "begCoordinate",
+        "endCoordinate",
+        "zCoordinate"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "beamsData"
+    ],
+    "type": "object"
+   },
+   "outputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "elements": {
+      "$ref": "#/ElementIdsOrErrors"
+     }
+    },
+    "required": [
+     "elements"
+    ],
+    "type": "object"
+   },
+   "version": "1.4.0"
+  },
+  "CreateClassificationSystems": {
+   "inputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "classificationSystemsWithItems": {
+      "$ref": "#/ClassificationSystemsWithItems"
+     }
+    },
+    "required": [
+     "classificationSystemsWithItems"
+    ],
+    "type": "object"
+   },
+   "outputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "executionResults": {
+      "$ref": "#/ExecutionResults"
+     }
+    },
+    "required": [
+     "executionResults"
+    ],
+    "type": "object"
+   },
+   "version": "1.5.0"
+  },
+  "CreateDoors": {
+   "inputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "doorsData": {
+      "items": {
+       "additionalProperties": false,
+       "properties": {
+        "centerOffset": {
+         "minimum": 0.0,
+         "type": "number"
+        },
+        "favoriteName": {
+         "description": "Optional. Name of an existing Door favorite (as returned by `GetFavoritesByType`). Applied to the Door tool defaults before the create.",
+         "type": "string"
+        },
+        "height": {
+         "exclusiveMinimum": 0.0,
+         "type": "number"
+        },
+        "libraryPartName": {
+         "description": "Optional. Localized library part name (docu_UName) to place instead of the tool default/favorite, e.g. a shutter part that has no favorite. It has to be a door library part. Applied to the tool defaults before cloning.",
+         "type": "string"
+        },
+        "oSide": {
+         "type": "boolean"
+        },
+        "ownerWallId": {
+         "$ref": "#/ElementId"
+        },
+        "refSide": {
+         "type": "boolean"
+        },
+        "reflected": {
+         "type": "boolean"
+        },
+        "sillHeight": {
+         "type": "number"
+        },
+        "width": {
+         "exclusiveMinimum": 0.0,
+         "type": "number"
+        }
+       },
+       "required": [
+        "ownerWallId",
+        "centerOffset"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "doorsData"
+    ],
+    "type": "object"
+   },
+   "outputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "elements": {
+      "$ref": "#/ElementIdsOrErrors"
+     }
+    },
+    "required": [
+     "elements"
+    ],
+    "type": "object"
+   },
+   "version": "1.4.0"
+  },
+  "CreateLayers": {
+   "inputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "layerDataArray": {
+      "description": "Array of data to create new Layers.",
+      "items": {
+       "additionalProperties": false,
+       "description": "Data to create a Layer.",
+       "properties": {
+        "attributeId": {
+         "$ref": "#/AttributeId",
+         "description": "Indentifier of the existing Layer to overwrite, ignored if overwriteExisting is false."
+        },
+        "index": {
+         "description": "Index of the existing Layer to overwrite, ignored if overwriteExisting is false.",
+         "type": "string"
+        },
+        "intersectionGroupNr": {
+         "description": "Intersection group. Elements on layers having the same group will be intersected.",
+         "type": "integer"
+        },
+        "isHidden": {
+         "description": "Hide/Show.",
+         "type": "boolean"
+        },
+        "isLocked": {
+         "description": "Lock/Unlock.",
+         "type": "boolean"
+        },
+        "isWireframe": {
+         "description": "Force the model to wireframe.",
+         "type": "boolean"
+        },
+        "name": {
+         "description": "Name. If overwriteExisting is true, then the existing Layer with the given name will be overwritten.",
+         "type": "string"
+        }
+       },
+       "required": [
+        "name"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     },
+     "overwriteExisting": {
+      "description": "Overwrite the Layer if exists with the same name, or if index is given with the same index. The default is false.",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "layerDataArray"
+    ],
+    "type": "object"
+   },
+   "outputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "attributeIds": {
+      "$ref": "#/AttributeIdsOrErrors"
+     }
+    },
+    "required": [
+     "attributeIds"
+    ],
+    "type": "object"
+   },
+   "version": "1.0.3"
+  },
+  "CreateMorphs": {
+   "inputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "morphsData": {
+      "items": {
+       "additionalProperties": false,
+       "properties": {
+        "basePoint": {
+         "$ref": "#/Coordinate3D"
+        },
+        "body": {
+         "$ref": "#/MorphBody",
+         "description": "Builds arbitrary geometry instead of a simple box. Mutually exclusive with `size` - give exactly one of the two."
+        },
+        "buildingMaterialId": {
+         "$ref": "#/AttributeId"
+        },
+        "castShadow": {
+         "type": "boolean"
+        },
+        "coverFillBGPen": {
+         "type": "integer"
+        },
+        "coverFillOrientation": {
+         "$ref": "#/CoverFillOrientation"
+        },
+        "coverFillPen": {
+         "type": "integer"
+        },
+        "coverFillType": {
+         "$ref": "#/AttributeId"
+        },
+        "cutFillBackgroundPen": {
+         "type": "integer"
+        },
+        "cutFillPen": {
+         "type": "integer"
+        },
+        "cutLinePen": {
+         "type": "integer"
+        },
+        "cutLineType": {
+         "$ref": "#/AttributeId"
+        },
+        "displayOption": {
+         "$ref": "#/DisplayOption"
+        },
+        "floorIndex": {
+         "description": "Optional floor index. If omitted, derived from the basePoint's z value.",
+         "type": "integer"
+        },
+        "isAutoOnStoryVisibility": {
+         "type": "boolean"
+        },
+        "level": {
+         "type": "number"
+        },
+        "linkToSettings": {
+         "$ref": "#/LinkToSettings"
+        },
+        "outlineContourDisplay": {
+         "type": "boolean"
+        },
+        "overheadLinePen": {
+         "type": "integer"
+        },
+        "overheadLineType": {
+         "$ref": "#/AttributeId"
+        },
+        "receiveShadow": {
+         "type": "boolean"
+        },
+        "showContour": {
+         "$ref": "#/StoryVisibility"
+        },
+        "showFill": {
+         "$ref": "#/StoryVisibility"
+        },
+        "size": {
+         "$ref": "#/Dimensions3D",
+         "description": "Builds a simple axis-aligned box of this size. Mutually exclusive with `body` - give exactly one of the two."
+        },
+        "surfaceId": {
+         "$ref": "#/AttributeId"
+        },
+        "textureProjectionCoords": {
+         "items": {
+          "$ref": "#/Coordinate3D"
+         },
+         "maxItems": 4,
+         "minItems": 4,
+         "type": "array"
+        },
+        "textureProjectionType": {
+         "$ref": "#/TextureProjectionType"
+        },
+        "topExpansion": {
+         "description": "Only used with `size` (box) morphs. Expands the top rectangle outwards on all four sides by this amount, creating a frustum (e.g. sloped excavation shape). 0 creates a cuboid.",
+         "minimum": 0.0,
+         "type": "number"
+        },
+        "uncutLinePen": {
+         "type": "integer"
+        },
+        "uncutLineType": {
+         "$ref": "#/AttributeId"
+        },
+        "use3DHatching": {
+         "type": "boolean"
+        },
+        "useCoverFillType": {
+         "type": "boolean"
+        },
+        "useDistortedCoverFill": {
+         "type": "boolean"
+        },
+        "viewDepthLimitation": {
+         "$ref": "#/ViewDepthLimitation"
+        },
+        "xAxis": {
+         "$ref": "#/Coordinate3D"
+        },
+        "yAxis": {
+         "$ref": "#/Coordinate3D"
+        },
+        "zAxis": {
+         "$ref": "#/Coordinate3D"
+        }
+       },
+       "required": [
+        "basePoint"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "morphsData"
+    ],
+    "type": "object"
+   },
+   "outputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "elements": {
+      "$ref": "#/ElementIdsOrErrors"
+     }
+    },
+    "required": [
+     "elements"
+    ],
+    "type": "object"
+   },
+   "version": "1.4.0"
+  },
+  "CreateSurfaces": {
+   "inputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "overwriteExisting": {
+      "description": "Overwrite the Surface if exists with the same name, or if index is given with the same index. The default is false.",
+      "type": "boolean"
+     },
+     "surfaceDataArray": {
+      "description": "Array of data to create new surfaces.",
+      "items": {
+       "additionalProperties": false,
+       "description": "Data to create a surface.",
+       "properties": {
+        "ambientReflection": {
+         "description": "Ambient percentage [0..100].",
+         "type": "number"
+        },
+        "attributeId": {
+         "$ref": "#/AttributeId",
+         "description": "Indentifier of the existing Surface to overwrite, ignored if overwriteExisting is false."
+        },
+        "diffuseReflection": {
+         "description": "Diffuse percentage [0..100].",
+         "type": "number"
+        },
+        "emissionAttenuation": {
+         "description": "Emission attenuation multiplied by 100 [0..10000].",
+         "type": "number"
+        },
+        "emissionColor": {
+         "$ref": "#/ColorRGB"
+        },
+        "fillId": {
+         "$ref": "#/AttributeIdArrayItem"
+        },
+        "index": {
+         "description": "Index of the existing surface to overwrite, ignored if overwriteExisting is false.",
+         "type": "string"
+        },
+        "materialType": {
+         "$ref": "#/SurfaceType"
+        },
+        "name": {
+         "description": "Name. If overwriteExisting is true, then the existing surface with the given name will be overwritten.",
+         "type": "string"
+        },
+        "shine": {
+         "description": "The shininess factor multiplied by 100 [0..10000].",
+         "type": "number"
+        },
+        "specularColor": {
+         "$ref": "#/ColorRGB"
+        },
+        "specularReflection": {
+         "description": "Specular percentage [0..100].",
+         "type": "number"
+        },
+        "surfaceColor": {
+         "$ref": "#/ColorRGB"
+        },
+        "texture": {
+         "$ref": "#/Texture"
+        },
+        "transparency": {
+         "description": "Transparency percentage [0..100].",
+         "type": "number"
+        },
+        "transparencyAttenuation": {
+         "description": "Transparency attenuation multiplied by 100 [0..10000].",
+         "type": "number"
+        }
+       },
+       "required": [
+        "name"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "surfaceDataArray"
+    ],
+    "type": "object"
+   },
+   "outputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "attributeIds": {
+      "$ref": "#/AttributeIdsOrErrors"
+     }
+    },
+    "required": [
+     "attributeIds"
+    ],
+    "type": "object"
+   },
+   "version": "1.2.2"
+  },
+  "CreateWalls": {
+   "inputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "wallsData": {
+      "items": {
+       "additionalProperties": false,
+       "properties": {
+        "aboveViewLinePen": {
+         "description": "Pen used when \"Overhead All\" is selected from the \"Floor Plan Display\" popup.",
+         "minimum": 1,
+         "type": "integer"
+        },
+        "aboveViewLineTypeId": {
+         "$ref": "#/AttributeId",
+         "description": "Line type used when \"Overhead All\" is selected from the \"Floor Plan Display\" popup - pairs with aboveViewLinePen."
+        },
+        "alignTexture": {
+         "description": "Align texture mapping to the wall's edges.",
+         "type": "boolean"
+        },
+        "arcAngle": {
+         "description": "Arc angle in radians; non-zero creates a curved wall (begCoordinate/endCoordinate are the chord endpoints).",
+         "type": "number"
+        },
+        "begCoordinate": {
+         "$ref": "#/Coordinate2D"
+        },
+        "belowViewLineTypeId": {
+         "$ref": "#/AttributeId",
+         "description": "Line type used when \"OutLines Only\" is selected from the \"Floor Plan Display\" popup (API_WallType::belowViewLineType)."
+        },
+        "buildingMaterialId": {
+         "$ref": "#/AttributeId"
+        },
+        "compositeId": {
+         "$ref": "#/AttributeId"
+        },
+        "contourLineTypeId": {
+         "$ref": "#/AttributeId",
+         "description": "Line type of the wall's own contour (API_WallType::contLtype) - pairs with contourPen, which only sets the pen, not the line type."
+        },
+        "contourPen": {
+         "description": "Pen of the wall's own contour/reference outline (API_WallType::contPen) - distinct from cutFillPen, which is the cut fill pattern's pen.",
+         "minimum": 1,
+         "type": "integer"
+        },
+        "contourPen3D": {
+         "description": "Pen of the wall's contour in 3D views (API_WallType::contPen3D).",
+         "minimum": 1,
+         "type": "integer"
+        },
+        "displayOption": {
+         "$ref": "#/DisplayOption"
+        },
+        "endCoordinate": {
+         "$ref": "#/Coordinate2D"
+        },
+        "favoriteName": {
+         "description": "Optional name of a Wall favorite to base the new element on. Its settings (structure, reference line location, top link, offsets, ...) are applied first, then the explicitly given fields override them. With a favorite only begCoordinate and endCoordinate are needed.",
+         "type": "string"
+        },
+        "floorIndex": {
+         "description": "Story index (as returned by GetStories). When provided, zCoordinate is interpreted as bottomOffset relative to the floor. Takes priority over zCoordinate for floor assignment.",
+         "type": "integer"
+        },
+        "height": {
+         "description": "Optional explicit height. Sets relativeTopStory to 0, so it replaces the top link of the favorite or the tool default. When omitted, the height and top link of the favorite (or of the Wall tool defaults) are kept.",
+         "exclusiveMinimum": 0.0,
+         "type": "number"
+        },
+        "id": {
+         "description": "Optional Element ID of the new element (the ID field of the Settings dialog, shown in schedules and labels; the same string GetDetailsOfElements returns as id). When omitted the element gets the next automatic ID of its tool.",
+         "type": "string"
+        },
+        "inheritEndSurface": {
+         "description": "The end surface of the wall is inherited from the adjoining wall.",
+         "type": "boolean"
+        },
+        "linkToSettings": {
+         "$ref": "#/LinkToSettings",
+         "description": "When newCreationMode is true, homeStoryDifference overrides the home story selected by floorIndex or derived from zCoordinate."
+        },
+        "logHeight": {
+         "description": "Height of the log for log walls. 0 means a normal (non-log) wall.",
+         "type": "number"
+        },
+        "materialsChained": {
+         "description": "Whether the surface materials are chained.",
+         "type": "boolean"
+        },
+        "offset": {
+         "description": "Optional reference line offset. When omitted, the favorite's or the Wall tool default's offset is kept.",
+         "type": "number"
+        },
+        "polyCanChange": {
+         "description": "The polygonal wall's corners can be changed in case of L and T connections. Only meaningful for a Polygonal wall (geometryType).",
+         "type": "boolean"
+        },
+        "profileId": {
+         "$ref": "#/AttributeId"
+        },
+        "referenceLineLocation": {
+         "$ref": "#/WallReferenceLineLocation",
+         "description": "Optional. When omitted, the favorite's or the Wall tool default's reference line location is kept. The Core* values only have an effect on a Composite or Profile wall."
+        },
+        "structureType": {
+         "$ref": "#/WallStructureType",
+         "description": "Optional. When neither this nor one of the attribute ids below is given, the favorite's or the Wall tool default's structure is kept."
+        },
+        "thickness": {
+         "description": "Optional thickness. When omitted, the favorite's or the Wall tool default's thickness is kept. Only takes effect on a Basic (homogeneous) wall - a Composite or Profile wall takes its thickness from the composite or profile attribute. Without structureType the new wall keeps the structure of the favorite (or the wall tool default), which may be a composite; send structureType 'Basic' for the thickness to apply.",
+         "exclusiveMinimum": 0.0,
+         "type": "number"
+        },
+        "useCompositePriority": {
+         "description": "When true, the Composite's own priority is used at junctions instead of connectionPriority.",
+         "type": "boolean"
+        },
+        "viewDepthLimitation": {
+         "$ref": "#/ViewDepthLimitation",
+         "description": "Only has an effect on a multi-story wall (relativeTopStory/topOffset making it span more than one story)."
+        },
+        "zCoordinate": {
+         "description": "Absolute Z when floorIndex is absent; bottomOffset relative to the floor when floorIndex is provided.",
+         "type": "number"
+        }
+       },
+       "required": [
+        "begCoordinate",
+        "endCoordinate"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "wallsData"
+    ],
+    "type": "object"
+   },
+   "outputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "elements": {
+      "$ref": "#/ElementIdsOrErrors"
+     }
+    },
+    "required": [
+     "elements"
+    ],
+    "type": "object"
+   },
+   "version": "1.4.0"
+  },
+  "CreateWindows": {
+   "inputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "windowsData": {
+      "items": {
+       "additionalProperties": false,
+       "properties": {
+        "centerOffset": {
+         "minimum": 0.0,
+         "type": "number"
+        },
+        "favoriteName": {
+         "description": "Optional. Name of an existing Window favorite (as returned by `GetFavoritesByType`). Applied to the Window tool defaults before the create.",
+         "type": "string"
+        },
+        "height": {
+         "exclusiveMinimum": 0.0,
+         "type": "number"
+        },
+        "libraryPartName": {
+         "description": "Optional. Localized library part name (docu_UName) to place instead of the tool default/favorite, e.g. a shutter part that has no favorite. It has to be a window library part. Applied to the tool defaults before cloning.",
+         "type": "string"
+        },
+        "oSide": {
+         "type": "boolean"
+        },
+        "ownerWallId": {
+         "$ref": "#/ElementId"
+        },
+        "refSide": {
+         "type": "boolean"
+        },
+        "reflected": {
+         "type": "boolean"
+        },
+        "sillHeight": {
+         "type": "number"
+        },
+        "width": {
+         "exclusiveMinimum": 0.0,
+         "type": "number"
+        }
+       },
+       "required": [
+        "ownerWallId",
+        "centerOffset"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "windowsData"
+    ],
+    "type": "object"
+   },
+   "outputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "elements": {
+      "$ref": "#/ElementIdsOrErrors"
+     }
+    },
+    "required": [
+     "elements"
+    ],
+    "type": "object"
+   },
+   "version": "1.4.0"
+  },
+  "CreateZoneCategories": {
+   "inputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "overwriteExisting": {
+      "description": "Overwrite the Zone Category if exists with the same name, or if index is given with the same index. The default is false.",
+      "type": "boolean"
+     },
+     "zoneCategoryDataArray": {
+      "description": "Array of data to create new Zone Categories.",
+      "items": {
+       "additionalProperties": false,
+       "description": "Data to create a Zone Category.",
+       "properties": {
+        "attributeId": {
+         "$ref": "#/AttributeId",
+         "description": "Indentifier of the existing Zone Category to overwrite, ignored if overwriteExisting is false."
+        },
+        "categoryCode": {
+         "description": "Code of the Zone Category.",
+         "type": "string"
+        },
+        "color": {
+         "$ref": "#/ColorRGB"
+        },
+        "index": {
+         "description": "Index of the existing Zone Category to overwrite, ignored if overwriteExisting is false.",
+         "type": "string"
+        },
+        "name": {
+         "description": "Name. If overwriteExisting is true, then the existing Zone Category with the given name will be overwritten.",
+         "type": "string"
+        },
+        "stampMainGuid": {
+         "description": "Main GUID of the zone stamp library part to use, e.g. the value returned by GetZoneCategories for an existing Zone Category or shown as MainGuid in an Attribute Manager XML export. If omitted, the stamp is copied from the Zone Category being overwritten, or from an existing Zone Category of the project when creating a new one.",
+         "type": "string"
+        },
+        "stampName": {
+         "description": "Document name of the zone stamp library part (GSM) to use, e.g. the value returned by GetZoneCategories or shown as StampDocumentName in an Attribute Manager XML export. Only used together with stampMainGuid/stampRevGuid; ignored otherwise.",
+         "type": "string"
+        },
+        "stampRevGuid": {
+         "description": "Revision GUID of the zone stamp library part to use, e.g. the value shown as RevGuid in an Attribute Manager XML export. Required together with stampMainGuid.",
+         "type": "string"
+        }
+       },
+       "required": [
+        "name"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "zoneCategoryDataArray"
+    ],
+    "type": "object"
+   },
+   "outputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "attributeIds": {
+      "$ref": "#/AttributeIdsOrErrors"
+     }
+    },
+    "required": [
+     "attributeIds"
+    ],
+    "type": "object"
+   },
+   "version": "1.5.4"
+  },
+  "CreateZones": {
+   "inputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "zonesData": {
+      "description": "Array of data to create Zones.",
+      "items": {
+       "additionalProperties": false,
+       "description": "The parameters of the new Zone.",
+       "properties": {
+        "categoryAttributeId": {
+         "$ref": "#/AttributeId",
+         "description": "The identifier of the zone category attribute."
+        },
+        "favoriteName": {
+         "description": "Optional name of a favorite to base the new element on. Its settings are applied first, then the explicitly given fields override them.",
+         "type": "string"
+        },
+        "fixedStampAngle": {
+         "description": "If true, the zone stamp angle remains fixed when the element is rotated.",
+         "type": "boolean"
+        },
+        "floorIndex": {
+         "description": "Optional story index of the new zone. An automatic zone (geometry.referencePosition) is found around its reference point on this story, which is made active in the floor plan while the zone is created; the previously active story is restored afterwards.",
+         "type": "number"
+        },
+        "geometry": {
+         "$ref": "#/ZoneCreationGeometry"
+        },
+        "id": {
+         "description": "Optional Element ID of the new element (the ID field of the Settings dialog, shown in schedules and labels; the same string GetDetailsOfElements returns as id). When omitted the element gets the next automatic ID of its tool.",
+         "type": "string"
+        },
+        "name": {
+         "description": "Name of the zone.",
+         "type": "string"
+        },
+        "numberStr": {
+         "description": "Zone number.",
+         "type": "string"
+        },
+        "stampAngle": {
+         "description": "Optional zone stamp rotation angle in radians.",
+         "type": "number"
+        },
+        "stampPosition": {
+         "$ref": "#/Coordinate2D",
+         "description": "Position of the origin of the zone stamp."
+        }
+       },
+       "required": [
+        "name",
+        "numberStr",
+        "geometry"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "zonesData"
+    ],
+    "type": "object"
+   },
+   "outputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "elements": {
+      "$ref": "#/ElementIdsOrErrors"
+     }
+    },
+    "required": [
+     "elements"
+    ],
+    "type": "object"
+   },
+   "version": "1.1.8"
+  },
+  "DeleteElements": {
+   "inputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "elements": {
+      "$ref": "#/Elements",
+      "description": "The elements to delete. The zones among them are deleted before all the others, so an automatic zone deleted together with its bounding elements is gone before its boundary is. Deleting the boundary of an automatic zone without the zone itself can open Archicad's modal 'No closed polygon found around the clicked point' dialog, which blocks the command until someone clicks it in Archicad."
+     }
+    },
+    "required": [
+     "elements"
+    ],
+    "type": "object"
+   },
+   "outputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "executionResults": {
+      "$ref": "#/ExecutionResults"
+     }
+    },
+    "required": [
+     "executionResults"
+    ],
+    "type": "object"
+   },
+   "version": "1.2.1"
+  },
+  "Get3DBoundingBoxes": {
+   "inputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "elements": {
+      "$ref": "#/Elements"
+     }
+    },
+    "required": [
+     "elements"
+    ],
+    "type": "object"
+   },
+   "outputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "boundingBoxes3D": {
+      "$ref": "#/BoundingBoxes3D"
+     }
+    },
+    "required": [
+     "boundingBoxes3D"
+    ],
+    "type": "object"
+   },
+   "version": "1.1.2"
+  },
+  "GetAddOnVersion": {
+   "inputScheme": null,
+   "outputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "version": {
+      "description": "Version number in the form of \"1.1.1\".",
+      "minLength": 1,
+      "type": "string"
+     }
+    },
+    "required": [
+     "version"
+    ],
+    "type": "object"
+   },
+   "version": "0.1.0"
+  },
+  "GetAttributesByType": {
+   "inputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "attributeType": {
+      "$ref": "#/AttributeType"
+     }
+    },
+    "required": [
+     "attributeType"
+    ],
+    "type": "object"
+   },
+   "outputScheme": {
+    "$ref": "#/AttributeHeadersOrError"
+   },
+   "version": "1.1.3"
+  },
+  "GetDetailsOfElements": {
+   "inputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "elements": {
+      "$ref": "#/Elements"
+     },
+     "fields": {
+      "description": "Optional filter for the fields to return for each element. When omitted, every field is returned. Fields not listed are not computed at all, so listing only what you need skips in particular the floorPlanPolygons extraction, which regenerates each element's 2D drawing primitives and can dominate the execution time of batch reads.",
+      "items": {
+       "$ref": "#/ElementDetailsField"
+      },
+      "minItems": 1,
+      "type": "array"
+     }
+    },
+    "required": [
+     "elements"
+    ],
+    "type": "object"
+   },
+   "outputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "detailsOfElements": {
+      "description": "One entry per input element, in the same order as the input elements array. An element that cannot be read gets an error entry in its place, so the position of an entry tells which input element it belongs to.",
+      "items": {
+       "oneOf": [
+        {
+         "additionalProperties": false,
+         "description": "Details of an element. When the optional fields filter is given in the input, only the requested fields are present; the required list below applies to unfiltered requests.",
+         "properties": {
+          "details": {
+           "$ref": "#/TypeSpecificDetails"
+          },
+          "drawIndex": {
+           "type": "number"
+          },
+          "floorIndex": {
+           "type": "number"
+          },
+          "floorPlanPolygons": {
+           "description": "Cut-fill polygons as drawn on the floor plan (wall joins resolved by ArchiCAD). Only collected for construction element types whose floor plan symbol comes from a real cut through the element - walls, columns, beams and their segments, slabs, roofs, shells, meshes, morphs, curtain walls and their segments/panels/frames, stairs and their risers/treads/structures. Absent for every other type, when the element has no cut fill, or when the floor plan database is not accessible.",
+           "items": {
+            "properties": {
+             "coordinates": {
+              "items": {
+               "$ref": "#/Coordinate2D"
+              },
+              "type": "array"
+             }
+            },
+            "type": "object"
+           },
+           "type": "array"
+          },
+          "hotlinkId": {
+           "$ref": "#/ElementId",
+           "description": "The hotlink instance this element belongs to. Present only for elements that came in through a placed hotlink; such elements are read-only."
+          },
+          "id": {
+           "type": "string"
+          },
+          "layerIndex": {
+           "type": "number"
+          },
+          "type": {
+           "$ref": "#/ElementType"
+          }
+         },
+         "required": [
+          "type",
+          "id",
+          "floorIndex",
+          "layerIndex",
+          "drawIndex",
+          "details"
+         ],
+         "type": "object"
+        },
+        {
+         "$ref": "#/ErrorItem"
+        }
+       ]
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "detailsOfElements"
+    ],
+    "type": "object"
+   },
+   "version": "1.5.7"
+  },
+  "GetProjectInfo": {
+   "inputScheme": null,
+   "outputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "isTeamwork": {
+      "description": "True, if the project is a Teamwork (BIMcloud) project.",
+      "type": "boolean"
+     },
+     "isUntitled": {
+      "description": "True, if the project is not saved yet.",
+      "type": "boolean"
+     },
+     "projectLocation": {
+      "description": "The location of the project in the filesystem or a BIMcloud project reference.",
+      "minLength": 1,
+      "type": "string"
+     },
+     "projectName": {
+      "description": "The name of the project.",
+      "minLength": 1,
+      "type": "string"
+     },
+     "projectPath": {
+      "description": "The path of the project. A filesystem path or a BIMcloud server relative path.",
+      "minLength": 1,
+      "type": "string"
+     }
+    },
+    "required": [
+     "isUntitled",
+     "isTeamwork"
+    ],
+    "type": "object"
+   },
+   "version": "0.1.0"
+  },
+  "GetSelectedElements": {
+   "inputScheme": null,
+   "outputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "elements": {
+      "$ref": "#/Elements"
+     }
+    },
+    "required": [
+     "elements"
+    ],
+    "type": "object"
+   },
+   "version": "0.1.0"
+  },
+  "GetStories": {
+   "inputScheme": null,
+   "outputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "actStory": {
+      "description": "Actual (currently visible in 2D) story index.",
+      "type": "integer"
+     },
+     "firstStory": {
+      "description": "First story index.",
+      "type": "integer"
+     },
+     "lastStory": {
+      "description": "Last story index.",
+      "type": "integer"
+     },
+     "skipNullFloor": {
+      "description": "Floor indices above ground-floor level may start with 1 instead of 0.",
+      "type": "boolean"
+     },
+     "stories": {
+      "$ref": "#/StoriesParameters"
+     }
+    },
+    "required": [
+     "firstStory",
+     "lastStory",
+     "actStory",
+     "skipNullFloor",
+     "stories"
+    ],
+    "type": "object"
+   },
+   "version": "1.1.5"
+  },
+  "SetDetailsOfElements": {
+   "inputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "elementsWithDetails": {
+      "description": "The elements with parameters.",
+      "items": {
+       "additionalProperties": false,
+       "properties": {
+        "details": {
+         "additionalProperties": false,
+         "description": "Details of an element.",
+         "properties": {
+          "drawIndex": {
+           "type": "number"
+          },
+          "floorIndex": {
+           "type": "number"
+          },
+          "id": {
+           "description": "The Element ID (the ID field of the element's Settings dialog, shown in schedules and labels). The same string GetDetailsOfElements returns as id.",
+           "type": "string"
+          },
+          "layerIndex": {
+           "type": "number"
+          },
+          "typeSpecificDetails": {
+           "$ref": "#/TypeSpecificSettings"
+          }
+         },
+         "required": [],
+         "type": "object"
+        },
+        "elementId": {
+         "$ref": "#/ElementId"
+        }
+       },
+       "required": [
+        "elementId",
+        "details"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "elementsWithDetails"
+    ],
+    "type": "object"
+   },
+   "outputScheme": {
+    "additionalProperties": false,
+    "properties": {
+     "executionResults": {
+      "$ref": "#/ExecutionResults"
+     }
+    },
+    "required": [
+     "executionResults"
+    ],
+    "type": "object"
+   },
+   "version": "1.0.7"
+  }
+ },
+ "definitions": {
+  "ArcSettings": {
+   "additionalProperties": false,
+   "description": "Settings for modifying an Arc or Circle. begAngle/endAngle are only applied to Arc, ignored for Circle.",
+   "properties": {
+    "angle": {
+     "type": "number"
+    },
+    "begAngle": {
+     "type": "number"
+    },
+    "endAngle": {
+     "type": "number"
+    },
+    "linePenIndex": {
+     "type": "integer"
+    },
+    "lineTypeId": {
+     "$ref": "#/AttributeId"
+    },
+    "origin": {
+     "$ref": "#/Coordinate2D"
+    },
+    "radius": {
+     "type": "number"
+    },
+    "ratio": {
+     "type": "number"
+    },
+    "reflected": {
+     "type": "boolean"
+    },
+    "roomSeparator": {
+     "type": "boolean"
+    }
+   },
+   "required": [],
+   "type": "object"
+  },
+  "AttributeCreationInfo": {
+   "additionalProperties": false,
+   "description": "How, from where, by whom and when the attribute was created. Available from Archicad 30, and only for an attribute Archicad keeps a creation record of: legacy or imported attributes may have none, and then the field is left out. Any of the texts may be empty.",
+   "properties": {
+    "creationTime": {
+     "description": "The creation time of the attribute, in seconds since 1970-01-01 00:00:00 UTC (a GSTime), the same scale as modificationTime.",
+     "type": "integer"
+    },
+    "creatorUserName": {
+     "description": "The Teamwork user name, or the OS login name in a solo project, at the time of creation.",
+     "type": "string"
+    },
+    "method": {
+     "description": "The creation method or workflow: AddOn (created by an Add-On), Merge (merging files), Paste (pasting from another file), New (created by the user through the UI), Import (an attribute file, IFC, DWG/DXF or another supported format), Explode (exploding a PDF or DWG), Duplicate (duplicating an attribute), Hotlink (a hotlinked file), XRef (a file attached in the Xref manager), Library (a library part), LibraryMaster (generated from GDL) or Unspecified.",
+     "enum": [
+      "AddOn",
+      "Merge",
+      "Paste",
+      "New",
+      "Import",
+      "Explode",
+      "Duplicate",
+      "Hotlink",
+      "XRef",
+      "Library",
+      "LibraryMaster",
+      "Unspecified"
+     ],
+     "type": "string"
+    },
+    "methodDescription": {
+     "description": "Human-readable description of the creation method.",
+     "type": "string"
+    },
+    "source": {
+     "description": "Human-readable origin, for example the name of the file or Add-On the attribute came from.",
+     "type": "string"
+    }
+   },
+   "required": [
+    "method",
+    "methodDescription",
+    "source",
+    "creatorUserName",
+    "creationTime"
+   ],
+   "type": "object"
+  },
+  "AttributeHeaders": {
+   "description": "Details of attributes.",
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "attributeId": {
+      "$ref": "#/AttributeId"
+     },
+     "creationInfo": {
+      "$ref": "#/AttributeCreationInfo"
+     },
+     "index": {
+      "description": "Index of the attribute.",
+      "type": "number"
+     },
+     "modificationTime": {
+      "description": "The last modification time of the attribute, in seconds since 1970-01-01 00:00:00 UTC (a GSTime), the same stamp the Attribute Manager writes as ModiTime into its XML export.",
+      "type": "integer"
+     },
+     "name": {
+      "description": "Name of the attribute.",
+      "type": "string"
+     }
+    },
+    "required": [
+     "attributeId",
+     "index",
+     "name",
+     "modificationTime"
+    ],
+    "type": "object"
+   },
+   "type": "array"
+  },
+  "AttributeHeadersOrError": {
+   "description": "The response of the GetAttributesByType command or an error.",
+   "oneOf": [
+    {
+     "$ref": "#/AttributeHeadersWrapper"
+    },
+    {
+     "$ref": "#/ErrorItem"
+    }
+   ],
+   "type": "object"
+  },
+  "AttributeHeadersWrapper": {
+   "additionalProperties": false,
+   "description": "The response of the GetAttributesByType command.",
+   "properties": {
+    "attributes": {
+     "$ref": "#/AttributeHeaders"
+    }
+   },
+   "required": [
+    "attributes"
+   ],
+   "type": "object"
+  },
+  "AttributeId": {
+   "additionalProperties": false,
+   "description": "The identifier of an attribute.",
+   "properties": {
+    "guid": {
+     "$ref": "#/Guid"
+    }
+   },
+   "required": [
+    "guid"
+   ],
+   "type": "object"
+  },
+  "AttributeIdArrayItem": {
+   "additionalProperties": false,
+   "properties": {
+    "attributeId": {
+     "$ref": "#/AttributeId"
+    }
+   },
+   "required": [
+    "attributeId"
+   ],
+   "type": "object"
+  },
+  "AttributeIdOrError": {
+   "description": "An attribute identifier or an error.",
+   "oneOf": [
+    {
+     "$ref": "#/AttributeIdArrayItem"
+    },
+    {
+     "$ref": "#/ErrorItem"
+    }
+   ],
+   "type": "object"
+  },
+  "AttributeIdsOrErrors": {
+   "description": "A list of attribute identifiers or errors.",
+   "items": {
+    "$ref": "#/AttributeIdOrError"
+   },
+   "type": "array"
+  },
+  "AttributeType": {
+   "description": "The type of an attribute.",
+   "enum": [
+    "Layer",
+    "Line",
+    "Fill",
+    "Composite",
+    "Surface",
+    "LayerCombination",
+    "ZoneCategory",
+    "Profile",
+    "PenTable",
+    "MEPSystem",
+    "OperationProfile",
+    "BuildingMaterial"
+   ],
+   "type": "string"
+  },
+  "AutomaticZoneGeometry": {
+   "additionalProperties": false,
+   "description": "Automatic zone placement.",
+   "properties": {
+    "referencePosition": {
+     "$ref": "#/Coordinate2D",
+     "description": "Reference point to automatically find zone."
+    }
+   },
+   "required": [
+    "referencePosition"
+   ],
+   "type": "object"
+  },
+  "BeamAnchorPoint": {
+   "description": "Anchor point of the beam cross section on a 3x3 grid.",
+   "enum": [
+    "TopLeft",
+    "TopCenter",
+    "TopRight",
+    "MiddleLeft",
+    "Center",
+    "MiddleRight",
+    "BottomLeft",
+    "BottomCenter",
+    "BottomRight"
+   ],
+   "type": "string"
+  },
+  "BeamDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "anchorPoint": {
+     "$ref": "#/BeamAnchorPoint"
+    },
+    "arcAngle": {
+     "description": "The arc angle of the (horizontally) curved beam in radians.",
+     "type": "number"
+    },
+    "beamShape": {
+     "enum": [
+      "Straight",
+      "HorizontallyCurved",
+      "VerticallyCurved"
+     ],
+     "type": "string"
+    },
+    "begCoordinate": {
+     "$ref": "#/Coordinate2D"
+    },
+    "buildingMaterialId": {
+     "$ref": "#/AttributeId",
+     "description": "Present when the cross section uses a building material rather than a custom profile."
+    },
+    "circleBased": {
+     "description": "True for a round beam cross section, false for rectangular.",
+     "type": "boolean"
+    },
+    "coverFill": {
+     "$ref": "#/CoverFill"
+    },
+    "cutFillBackgroundPen": {
+     "$ref": "#/OverriddenPen"
+    },
+    "cutFillPen": {
+     "$ref": "#/OverriddenPen"
+    },
+    "endCoordinate": {
+     "$ref": "#/Coordinate2D"
+    },
+    "height": {
+     "description": "Cross section height of the beam (all segments).",
+     "type": "number"
+    },
+    "holes": {
+     "items": {
+      "$ref": "#/BeamHole"
+     },
+     "type": "array"
+    },
+    "isFlipped": {
+     "type": "boolean"
+    },
+    "isSlanted": {
+     "type": "boolean"
+    },
+    "isWidthAndHeightLinked": {
+     "description": "When true, Archicad keeps width and height equal - set to false via ModifyBeams/CreateBeams to give them independent values.",
+     "type": "boolean"
+    },
+    "level": {
+     "description": "base height of the beam relative to the floor level",
+     "type": "number"
+    },
+    "offset": {
+     "description": "beam ref.line offset from the center",
+     "type": "number"
+    },
+    "profileAngle": {
+     "type": "number"
+    },
+    "profileId": {
+     "$ref": "#/AttributeId",
+     "description": "Present when the cross section uses a custom extruded profile rather than a building material."
+    },
+    "slantAngle": {
+     "description": "The slant angle of the beam in radians.",
+     "type": "number"
+    },
+    "verticalCurveHeight": {
+     "description": "The height of the vertical curve of the beam.",
+     "type": "number"
+    },
+    "width": {
+     "description": "Cross section width of the beam (all segments).",
+     "type": "number"
+    },
+    "zCoordinate": {
+     "type": "number"
+    }
+   },
+   "required": [
+    "begCoordinate",
+    "endCoordinate",
+    "zCoordinate",
+    "level",
+    "offset",
+    "slantAngle",
+    "arcAngle",
+    "verticalCurveHeight"
+   ],
+   "type": "object"
+  },
+  "BeamHole": {
+   "additionalProperties": false,
+   "properties": {
+    "centerX": {
+     "type": "number"
+    },
+    "centerZ": {
+     "type": "number"
+    },
+    "height": {
+     "type": "number"
+    },
+    "holeId": {
+     "type": "number"
+    },
+    "showContour": {
+     "type": "boolean"
+    },
+    "type": {
+     "$ref": "#/BeamHoleType"
+    },
+    "width": {
+     "type": "number"
+    }
+   },
+   "required": [
+    "holeId",
+    "type",
+    "centerX",
+    "centerZ",
+    "width"
+   ],
+   "type": "object"
+  },
+  "BeamHoleType": {
+   "enum": [
+    "Rectangular",
+    "Circular"
+   ],
+   "type": "string"
+  },
+  "BeamSegmentDetails": {
+   "additionalProperties": false,
+   "description": "Details of a BeamSegment subelement of a Beam.",
+   "properties": {
+    "buildingMaterialId": {
+     "$ref": "#/AttributeId",
+     "description": "Present when the cross section uses a building material rather than a custom profile."
+    },
+    "circleBased": {
+     "description": "True for a round cross section, false for rectangular.",
+     "type": "boolean"
+    },
+    "height": {
+     "description": "Cross section height of the segment.",
+     "type": "number"
+    },
+    "isWidthAndHeightLinked": {
+     "type": "boolean"
+    },
+    "ownerElementId": {
+     "$ref": "#/ElementId",
+     "description": "The Beam element the segment belongs to."
+    },
+    "profileId": {
+     "$ref": "#/AttributeId",
+     "description": "Present when the cross section uses a custom extruded profile rather than a building material."
+    },
+    "structureType": {
+     "enum": [
+      "Basic",
+      "Profile"
+     ],
+     "type": "string"
+    },
+    "width": {
+     "description": "Cross section width of the segment.",
+     "type": "number"
+    }
+   },
+   "required": [
+    "structureType",
+    "width",
+    "height",
+    "isWidthAndHeightLinked",
+    "circleBased"
+   ],
+   "type": "object"
+  },
+  "BoundingBox2D": {
+   "additionalProperties": false,
+   "description": "A two-dimensional bounding box defined by its minimum and maximum coordinates.",
+   "properties": {
+    "xMax": {
+     "type": "number"
+    },
+    "xMin": {
+     "type": "number"
+    },
+    "yMax": {
+     "type": "number"
+    },
+    "yMin": {
+     "type": "number"
+    }
+   },
+   "required": [
+    "xMin",
+    "yMin",
+    "xMax",
+    "yMax"
+   ],
+   "type": "object"
+  },
+  "BoundingBox3D": {
+   "additionalProperties": false,
+   "description": "A 3D bounding box of an element.",
+   "properties": {
+    "xMax": {
+     "description": "The maximum X value of the bounding box.",
+     "type": "number"
+    },
+    "xMin": {
+     "description": "The minimum X value of the bounding box.",
+     "type": "number"
+    },
+    "yMax": {
+     "description": "The maximum Y value of the bounding box.",
+     "type": "number"
+    },
+    "yMin": {
+     "description": "The minimum Y value of the bounding box.",
+     "type": "number"
+    },
+    "zMax": {
+     "description": "The maximum Z value of the bounding box.",
+     "type": "number"
+    },
+    "zMin": {
+     "description": "The minimum Z value of the bounding box.",
+     "type": "number"
+    }
+   },
+   "required": [
+    "xMin",
+    "yMin",
+    "zMin",
+    "xMax",
+    "yMax",
+    "zMax"
+   ],
+   "type": "object"
+  },
+  "BoundingBox3DArrayItem": {
+   "additionalProperties": false,
+   "description": "A wrapper containing a 3D bounding box.",
+   "properties": {
+    "boundingBox3D": {
+     "$ref": "#/BoundingBox3D"
+    }
+   },
+   "required": [
+    "boundingBox3D"
+   ],
+   "type": "object"
+  },
+  "BoundingBox3DOrError": {
+   "description": "A 3D bounding box or an error.",
+   "oneOf": [
+    {
+     "$ref": "#/BoundingBox3DArrayItem"
+    },
+    {
+     "$ref": "#/ErrorItem"
+    }
+   ],
+   "type": "object"
+  },
+  "BoundingBoxes3D": {
+   "description": "A list of 3D bounding boxes.",
+   "items": {
+    "$ref": "#/BoundingBox3DOrError"
+   },
+   "type": "array"
+  },
+  "ClassificationItemDetails": {
+   "additionalProperties": false,
+   "description": "The details of a classification item.",
+   "properties": {
+    "children": {
+     "description": "A list of classification items.",
+     "items": {
+      "$ref": "#/ClassificationItemDetails"
+     },
+     "type": "array"
+    },
+    "description": {
+     "description": "The description of the classification item.",
+     "type": "string"
+    },
+    "id": {
+     "description": "The unique identifier of the classification item as specified by the user.",
+     "type": "string"
+    },
+    "name": {
+     "description": "The display name of the classification item.",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "name",
+    "description"
+   ],
+   "type": "object"
+  },
+  "ClassificationSystemDetails": {
+   "additionalProperties": false,
+   "description": "The details of a classification system.",
+   "properties": {
+    "date": {
+     "$ref": "#/Date",
+     "description": "The release date of the classification system's current version."
+    },
+    "description": {
+     "description": "The description of the classification system.",
+     "type": "string"
+    },
+    "name": {
+     "description": "The display name of the classification system.",
+     "type": "string"
+    },
+    "source": {
+     "description": "The source of the classification system (e.g. URL to a classification system standard).",
+     "type": "string"
+    },
+    "version": {
+     "description": "The version of the classification system.",
+     "type": "string"
+    }
+   },
+   "required": [
+    "name",
+    "description",
+    "source",
+    "version",
+    "date"
+   ],
+   "type": "object"
+  },
+  "ClassificationSystemsWithItems": {
+   "description": "Classification systems with items.",
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "classificationItems": {
+      "description": "A list of classification items in the classification system.",
+      "items": {
+       "$ref": "#/ClassificationItemDetails"
+      },
+      "type": "array"
+     },
+     "classificationSystem": {
+      "$ref": "#/ClassificationSystemDetails"
+     }
+    },
+    "required": [
+     "classificationSystem",
+     "classificationItems"
+    ],
+    "type": "object"
+   },
+   "type": "array"
+  },
+  "ColorRGB": {
+   "additionalProperties": false,
+   "description": "RGB color.",
+   "properties": {
+    "blue": {
+     "description": "Blue value between 0.0 and 1.0",
+     "type": "number"
+    },
+    "green": {
+     "description": "Green value between 0.0 and 1.0",
+     "type": "number"
+    },
+    "red": {
+     "description": "Red value between 0.0 and 1.0",
+     "type": "number"
+    }
+   },
+   "required": [
+    "red",
+    "green",
+    "blue"
+   ],
+   "type": "object"
+  },
+  "ColumnCoreAnchor": {
+   "description": "Anchor point of the column core on a 3x3 grid.",
+   "enum": [
+    "TopLeft",
+    "TopCenter",
+    "TopRight",
+    "MiddleLeft",
+    "Center",
+    "MiddleRight",
+    "BottomLeft",
+    "BottomCenter",
+    "BottomRight"
+   ],
+   "type": "string"
+  },
+  "ColumnDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "axisRotationAngle": {
+     "type": "number"
+    },
+    "bottomOffset": {
+     "description": "base level of the column relative to the floor level",
+     "type": "number"
+    },
+    "buildingMaterialId": {
+     "$ref": "#/AttributeId",
+     "description": "Present when the cross section uses a building material rather than a custom profile."
+    },
+    "circleBased": {
+     "description": "True for a round column cross section, false for rectangular.",
+     "type": "boolean"
+    },
+    "coreAnchor": {
+     "$ref": "#/ColumnCoreAnchor"
+    },
+    "coverFill": {
+     "$ref": "#/CoverFill"
+    },
+    "cutFillBackgroundPen": {
+     "$ref": "#/OverriddenPen"
+    },
+    "cutFillPen": {
+     "$ref": "#/OverriddenPen"
+    },
+    "depth": {
+     "description": "Cross section depth (height) of the column (all segments).",
+     "type": "number"
+    },
+    "height": {
+     "description": "height relative to bottom",
+     "type": "number"
+    },
+    "isFlipped": {
+     "description": "Has no visible effect on a circular column (circleBased cross section) - Archicad ignores it there.",
+     "type": "boolean"
+    },
+    "isSlanted": {
+     "type": "boolean"
+    },
+    "isWidthAndHeightLinked": {
+     "description": "When true, Archicad keeps width and depth equal - set to false via ModifyColumns/CreateColumns to give them independent values.",
+     "type": "boolean"
+    },
+    "origin": {
+     "$ref": "#/Coordinate2D"
+    },
+    "profileId": {
+     "$ref": "#/AttributeId",
+     "description": "Present when the cross section uses a custom extruded profile rather than a building material."
+    },
+    "relativeTopStory": {
+     "description": "Non-zero links the column's top to another story instead of an explicit height - do not set together with 'height' via ModifyColumns in the same call.",
+     "type": "number"
+    },
+    "slantAngle": {
+     "type": "number"
+    },
+    "slantDirectionAngle": {
+     "type": "number"
+    },
+    "topOffset": {
+     "type": "number"
+    },
+    "width": {
+     "description": "Cross section width of the column (all segments).",
+     "type": "number"
+    },
+    "wrapping": {
+     "type": "boolean"
+    },
+    "zCoordinate": {
+     "type": "number"
+    }
+   },
+   "required": [
+    "origin",
+    "zCoordinate",
+    "height",
+    "bottomOffset"
+   ],
+   "type": "object"
+  },
+  "ColumnSegmentDetails": {
+   "additionalProperties": false,
+   "description": "Details of a ColumnSegment subelement of a Column.",
+   "properties": {
+    "buildingMaterialId": {
+     "$ref": "#/AttributeId",
+     "description": "Present when the cross section uses a building material rather than a custom profile."
+    },
+    "circleBased": {
+     "description": "True for a round cross section, false for rectangular.",
+     "type": "boolean"
+    },
+    "depth": {
+     "description": "Cross section depth (height) of the segment.",
+     "type": "number"
+    },
+    "isWidthAndHeightLinked": {
+     "type": "boolean"
+    },
+    "ownerElementId": {
+     "$ref": "#/ElementId",
+     "description": "The Column element the segment belongs to."
+    },
+    "profileId": {
+     "$ref": "#/AttributeId",
+     "description": "Present when the cross section uses a custom extruded profile rather than a building material."
+    },
+    "structureType": {
+     "enum": [
+      "Basic",
+      "Profile"
+     ],
+     "type": "string"
+    },
+    "width": {
+     "description": "Cross section width of the segment.",
+     "type": "number"
+    }
+   },
+   "required": [
+    "structureType",
+    "width",
+    "depth",
+    "isWidthAndHeightLinked",
+    "circleBased"
+   ],
+   "type": "object"
+  },
+  "Coordinate2D": {
+   "additionalProperties": false,
+   "description": "2D coordinate.",
+   "properties": {
+    "x": {
+     "description": "X value of the coordinate.",
+     "type": "number"
+    },
+    "y": {
+     "description": "Y value of the coordinate.",
+     "type": "number"
+    }
+   },
+   "required": [
+    "x",
+    "y"
+   ],
+   "type": "object"
+  },
+  "Coordinate3D": {
+   "additionalProperties": false,
+   "description": "3D coordinate.",
+   "properties": {
+    "x": {
+     "description": "X value of the coordinate.",
+     "type": "number"
+    },
+    "y": {
+     "description": "Y value of the coordinate.",
+     "type": "number"
+    },
+    "z": {
+     "description": "Z value of the coordinate.",
+     "type": "number"
+    }
+   },
+   "required": [
+    "x",
+    "y",
+    "z"
+   ],
+   "type": "object"
+  },
+  "CoverFill": {
+   "additionalProperties": false,
+   "description": "Floor plan cover fill settings of a Column or Beam.",
+   "properties": {
+    "backgroundPen": {
+     "type": "integer"
+    },
+    "fillId": {
+     "$ref": "#/AttributeId"
+    },
+    "foregroundPen": {
+     "type": "integer"
+    },
+    "orientationComesFrom3D": {
+     "description": "Whether the cover fill orientation comes from the 3D view of the element.",
+     "type": "boolean"
+    },
+    "transformation": {
+     "$ref": "#/CoverFillTransformation"
+    },
+    "transformationType": {
+     "enum": [
+      "Global",
+      "Rotated",
+      "Distorted"
+     ],
+     "type": "string"
+    },
+    "use": {
+     "description": "Whether the cover fill is shown on the floor plan.",
+     "type": "boolean"
+    },
+    "useFromSurface": {
+     "description": "Whether the fill is taken from the top surface material of the element.",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "use",
+    "useFromSurface",
+    "orientationComesFrom3D",
+    "fillId",
+    "foregroundPen",
+    "backgroundPen",
+    "transformationType",
+    "transformation"
+   ],
+   "type": "object"
+  },
+  "CoverFillOrientation": {
+   "additionalProperties": false,
+   "description": "Orientation/distortion of the floor plan cover fill.",
+   "properties": {
+    "innerRadius": {
+     "description": "Radius for circular fill distortion (type Centered only).",
+     "type": "number"
+    },
+    "matrix00": {
+     "description": "X component of the primary distortion (direction) vector - the cosine of the fill angle, if not distorted.",
+     "type": "number"
+    },
+    "matrix01": {
+     "description": "X component of the secondary distortion vector - the cosine of the normal vector's angle, if not distorted.",
+     "type": "number"
+    },
+    "matrix10": {
+     "description": "Y component of the primary distortion (direction) vector - the sine of the fill angle, if not distorted.",
+     "type": "number"
+    },
+    "matrix11": {
+     "description": "Y component of the secondary distortion vector - the sine of the normal vector's angle, if not distorted.",
+     "type": "number"
+    },
+    "origo": {
+     "$ref": "#/Coordinate2D",
+     "description": "Origin of the fill relative to the project origin."
+    },
+    "type": {
+     "$ref": "#/HatchOrientationType"
+    }
+   },
+   "type": "object"
+  },
+  "CoverFillTransformation": {
+   "additionalProperties": false,
+   "description": "Orientation and distortion parameters of a cover fill.",
+   "properties": {
+    "origin": {
+     "$ref": "#/Coordinate2D",
+     "description": "The origin of the fill relative to the center of the element."
+    },
+    "xAxis": {
+     "$ref": "#/Coordinate2D",
+     "description": "Primary distortion (direction) vector."
+    },
+    "yAxis": {
+     "$ref": "#/Coordinate2D",
+     "description": "Secondary distortion (direction) vector."
+    }
+   },
+   "required": [
+    "origin",
+    "xAxis",
+    "yAxis"
+   ],
+   "type": "object"
+  },
+  "CurtainWallDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "actualHeight": {
+     "description": "The height of the curtain wall as calculated by Archicad (ACAPI_CurtainWall_GetCWHeight). Omitted when Archicad cannot calculate it.",
+     "type": "number"
+    },
+    "angle": {
+     "description": "The rotation angle of the curtain wall in radians.",
+     "type": "number"
+    },
+    "flipped": {
+     "type": "boolean"
+    },
+    "height": {
+     "description": "The height setting stored on the curtain wall element.",
+     "type": "number"
+    }
+   },
+   "required": [
+    "height",
+    "flipped",
+    "angle"
+   ],
+   "type": "object"
+  },
+  "CurtainWallFrameDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "begCoordinate": {
+     "$ref": "#/Coordinate3D"
+    },
+    "className": {
+     "type": "string"
+    },
+    "endCoordinate": {
+     "$ref": "#/Coordinate3D"
+    },
+    "frameContour": {
+     "additionalProperties": false,
+     "description": "The parameters of the frame contour.",
+     "properties": {
+      "a1": {
+       "description": "Width1 of the frame contour.",
+       "type": "number"
+      },
+      "a2": {
+       "description": "Width2 of the frame contour.",
+       "type": "number"
+      },
+      "b1": {
+       "description": "Length1 of the frame contour.",
+       "type": "number"
+      },
+      "b2": {
+       "description": "Length2 of the frame contour.",
+       "type": "number"
+      }
+     },
+     "required": [
+      "a1",
+      "a2",
+      "b1",
+      "b2"
+     ],
+     "type": "object"
+    },
+    "orientationVector": {
+     "$ref": "#/Coordinate3D"
+    },
+    "panelConnectionHole": {
+     "additionalProperties": false,
+     "description": "The parameters of the panel connection hole.",
+     "properties": {
+      "d": {
+       "description": "Depth of the panel connection hole.",
+       "type": "number"
+      },
+      "w": {
+       "description": "Width of the panel connection hole.",
+       "type": "number"
+      }
+     },
+     "required": [
+      "d",
+      "w"
+     ],
+     "type": "object"
+    },
+    "segmentIndex": {
+     "description": "The index of the curtain wall segment to which this frame belongs.",
+     "type": "number"
+    },
+    "type": {
+     "$ref": "#/CurtainWallFrameType"
+    }
+   },
+   "required": [
+    "begCoordinate",
+    "endCoordinate",
+    "orientationVector",
+    "panelConnectionHole",
+    "frameContour",
+    "segmentIndex",
+    "className",
+    "type"
+   ],
+   "type": "object"
+  },
+  "CurtainWallFrameType": {
+   "description": "Enumeration of available curtain wall frame types.",
+   "enum": [
+    "Deleted",
+    "Division",
+    "Corner",
+    "Boundary",
+    "Custom"
+   ],
+   "type": "string"
+  },
+  "CurtainWallPanelDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "className": {
+     "type": "string"
+    },
+    "frames": {
+     "description": "The surrounding frames.",
+     "items": {
+      "$ref": "#/ElementIdArrayItem"
+     },
+     "minItems": 3,
+     "type": "array"
+    },
+    "isDegenerate": {
+     "description": "Indicates if the panel is degenerate. Omitted when Archicad cannot tell.",
+     "type": "boolean"
+    },
+    "isHidden": {
+     "description": "Indicates if the panel is hidden (deleted panels remain in the database).",
+     "type": "boolean"
+    },
+    "polygonCoordinates": {
+     "description": "The 3D coordinates of the panel polygon.",
+     "items": {
+      "$ref": "#/Coordinate3D"
+     },
+     "minItems": 3,
+     "type": "array"
+    },
+    "segmentIndex": {
+     "description": "The index of the curtain wall segment to which this panel belongs.",
+     "type": "number"
+    }
+   },
+   "required": [
+    "polygonCoordinates",
+    "isHidden",
+    "segmentIndex",
+    "className",
+    "frames"
+   ],
+   "type": "object"
+  },
+  "CurtainWallSegmentDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "arcOrigin": {
+     "$ref": "#/Coordinate3D"
+    },
+    "begCoordinate": {
+     "$ref": "#/Coordinate3D"
+    },
+    "endCoordinate": {
+     "$ref": "#/Coordinate3D"
+    },
+    "extrusionVector": {
+     "$ref": "#/Coordinate3D"
+    },
+    "gridAngle": {
+     "description": "The angle of the grid in radians.",
+     "type": "number"
+    },
+    "gridOrigin": {
+     "$ref": "#/Coordinate3D"
+    },
+    "isNegativeArc": {
+     "description": "Indicates if the arc is negative.",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "begCoordinate",
+    "endCoordinate",
+    "extrusionVector",
+    "gridOrigin",
+    "gridAngle"
+   ],
+   "type": "object"
+  },
+  "Date": {
+   "description": "A date in its string representation as defined in ISO 8601: YYYY-MM-DD.",
+   "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+   "type": "string"
+  },
+  "DetailWorksheetDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "angle": {
+     "description": "The rotation angle (radian) of the marker symbol",
+     "type": "number"
+    },
+    "basePoint": {
+     "$ref": "#/Coordinate2D",
+     "description": "Coordinate of the base point"
+    },
+    "clipPolygon": {
+     "description": "The clip polygon of the detail/worksheet",
+     "items": {
+      "$ref": "#/Coordinate2D"
+     },
+     "type": "array"
+    },
+    "detailIdStr": {
+     "description": "Reference ID of the detail/worksheet",
+     "type": "string"
+    },
+    "detailName": {
+     "description": "Name of the detail/worksheet",
+     "type": "string"
+    },
+    "isHorizontalMarker": {
+     "description": "Marker symbol is always horizontal?",
+     "type": "boolean"
+    },
+    "isWindowOpened": {
+     "description": "Side (detail/worksheet) window is opened?",
+     "type": "boolean"
+    },
+    "linkData": {
+     "additionalProperties": false,
+     "description": "The marker link data",
+     "properties": {
+      "referredDrawing": {
+       "$ref": "#/ElementId",
+       "description": "Guid of the referred drawing. Only if the marker refers to a drawing."
+      },
+      "referredPMViewPoint": {
+       "$ref": "#/ElementId",
+       "description": "Guid of the referred view point. Only if the marker refers to a view point."
+      },
+      "referredView": {
+       "$ref": "#/ElementId",
+       "description": "Guid of the referred view. Only if the marker refers to a view."
+      }
+     },
+     "required": [],
+     "type": "object"
+    },
+    "markerId": {
+     "$ref": "#/ElementId",
+     "description": "Guid of the marker symbol"
+    }
+   },
+   "required": [
+    "basePoint",
+    "angle",
+    "markerId",
+    "detailName",
+    "detailIdStr",
+    "isHorizontalMarker",
+    "isWindowOpened",
+    "clipPolygon",
+    "linkData"
+   ],
+   "type": "object"
+  },
+  "DimensionOrigin": {
+   "description": "The origin a level dimension measures from.",
+   "enum": [
+    "ProjectZero",
+    "ReferenceLevel1",
+    "ReferenceLevel2",
+    "StoredOrigin",
+    "Altitude"
+   ],
+   "type": "string"
+  },
+  "Dimensions3D": {
+   "additionalProperties": false,
+   "description": "Dimensions in 3D.",
+   "properties": {
+    "x": {
+     "description": "X dimension.",
+     "type": "number"
+    },
+    "y": {
+     "description": "Y dimension.",
+     "type": "number"
+    },
+    "z": {
+     "description": "Z dimension.",
+     "type": "number"
+    }
+   },
+   "required": [
+    "x",
+    "y",
+    "z"
+   ],
+   "type": "object"
+  },
+  "DisplayOption": {
+   "description": "Floor plan display option.",
+   "enum": [
+    "Standard",
+    "StandardWithAbstract",
+    "CutOnly",
+    "OutLinesOnly",
+    "AbstractAll",
+    "CutAll"
+   ],
+   "type": "string"
+  },
+  "DrawingDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "angle": {
+     "description": "Rotation angle of the drawing in radians.",
+     "type": "number"
+    },
+    "borderLineTypeIndex": {
+     "description": "Attribute index of the line type of the drawing's border.",
+     "type": "integer"
+    },
+    "borderPenIndex": {
+     "description": "Pen index of the drawing's border.",
+     "type": "integer"
+    },
+    "borderSize": {
+     "description": "Border size of the drawing (API_DrawingType::borderSize), in meters.",
+     "type": "number"
+    },
+    "bounds": {
+     "$ref": "#/BoundingBox2D",
+     "description": "Bounds of the drawing on the layout."
+    },
+    "clipPolygon": {
+     "description": "Polygon (in model coordinates) used to clip the drawing view. Present only when isCutWithFrame is true.",
+     "items": {
+      "$ref": "#/Coordinate2D"
+     },
+     "minItems": 3,
+     "type": "array"
+    },
+    "customName": {
+     "description": "The drawing's custom title name. Present only when nameType is CustomName.",
+     "type": "string"
+    },
+    "customNumber": {
+     "description": "The drawing's custom title ID. Present only when numberingType is CustomNumber.",
+     "type": "string"
+    },
+    "drawingScale": {
+     "description": "The nominal scale of the drawing.",
+     "type": "number"
+    },
+    "hasBorderLine": {
+     "description": "Whether the drawing shows a printable border (Drawing Settings > Frame > Add Printable Border).",
+     "type": "boolean"
+    },
+    "isCutWithFrame": {
+     "description": "Whether the drawing is clipped by a custom polygon (see clipPolygon) instead of showing the full auto-fit extent.",
+     "type": "boolean"
+    },
+    "isInNumbering": {
+     "description": "Whether the drawing is included in the automatic drawing numbering sequence.",
+     "type": "boolean"
+    },
+    "modelOffset": {
+     "$ref": "#/Coordinate2D",
+     "description": "Offset of the model origin within the drawing."
+    },
+    "nameType": {
+     "$ref": "#/DrawingNameType"
+    },
+    "navigatorItemId": {
+     "$ref": "#/NavigatorItemId",
+     "description": "The identifier of the navigator item (view/layout) this Drawing was created from. Read-only: Archicad only lets this be set at creation time (see CreateDrawings) - it cannot be changed afterwards to relink the Drawing to a different source."
+    },
+    "numberingType": {
+     "$ref": "#/DrawingNumberingType"
+    },
+    "pos": {
+     "$ref": "#/Coordinate2D",
+     "description": "Position of the drawing's reference point on the layout."
+    },
+    "ratio": {
+     "description": "Scale ratio applied to the drawing relative to its source view.",
+     "type": "number"
+    },
+    "titleElementId": {
+     "$ref": "#/ElementId",
+     "description": "Id of the drawing title, itself a placed GDL object element (font/pen/size aside, its own settings are reachable like any other element, e.g. with GetGDLParametersOfElements/SetGDLParametersOfElements). Absent if the drawing has no title object."
+    },
+    "titleLibraryPartIndex": {
+     "description": "Library part index of the drawing title (API_DrawingTitle::libInd). A negative/invalid index means no title object is instantiated; setting it to a valid index (e.g. copied from another drawing) makes Archicad create the title's own placed element.",
+     "type": "number"
+    }
+   },
+   "required": [
+    "pos",
+    "angle",
+    "ratio",
+    "drawingScale",
+    "modelOffset",
+    "isCutWithFrame",
+    "bounds",
+    "navigatorItemId",
+    "nameType",
+    "numberingType",
+    "isInNumbering",
+    "hasBorderLine",
+    "borderLineTypeIndex",
+    "borderPenIndex",
+    "borderSize",
+    "titleLibraryPartIndex"
+   ],
+   "type": "object"
+  },
+  "DrawingNameType": {
+   "description": "How the drawing's title name is assembled (Identification tabpage of the Drawing Settings dialog).",
+   "enum": [
+    "ViewOrSourceFileName",
+    "ViewIdAndName",
+    "CustomName"
+   ],
+   "type": "string"
+  },
+  "DrawingNumberingType": {
+   "description": "How the drawing's title ID is assigned (Identification tabpage of the Drawing Settings dialog).",
+   "enum": [
+    "ByLayout",
+    "ByViewId",
+    "CustomNumber"
+   ],
+   "type": "string"
+  },
+  "DrawingSettings": {
+   "additionalProperties": false,
+   "description": "Modifiable settings for a Drawing element placed on a layout.",
+   "properties": {
+    "angle": {
+     "description": "Rotation angle of the drawing in radians.",
+     "type": "number"
+    },
+    "borderLineTypeIndex": {
+     "description": "Attribute index of the line type of the drawing's border.",
+     "minimum": 1,
+     "type": "integer"
+    },
+    "borderPenIndex": {
+     "description": "Pen index of the drawing's border.",
+     "maximum": 255,
+     "minimum": 1,
+     "type": "integer"
+    },
+    "borderSize": {
+     "description": "Border size of the drawing (API_DrawingType::borderSize), in meters.",
+     "type": "number"
+    },
+    "clipPolygon": {
+     "description": "Polygon (in model coordinates) used to clip the drawing view. At least 3 points. Setting this also enables polygon clipping (isCutWithFrame becomes true); to remove clipping, set isCutWithFrame to false instead.",
+     "items": {
+      "$ref": "#/Coordinate2D"
+     },
+     "minItems": 3,
+     "type": "array"
+    },
+    "customName": {
+     "description": "The drawing's custom title name. Only used when nameType is CustomName.",
+     "type": "string"
+    },
+    "customNumber": {
+     "description": "The drawing's custom title ID. Only used when numberingType is CustomNumber.",
+     "type": "string"
+    },
+    "drawingScale": {
+     "description": "The nominal scale of the drawing.",
+     "type": "number"
+    },
+    "hasBorderLine": {
+     "description": "Whether the drawing shows a printable border (Drawing Settings > Frame > Add Printable Border).",
+     "type": "boolean"
+    },
+    "isCutWithFrame": {
+     "description": "Whether the drawing is clipped by a custom polygon. Set to false to clear an existing crop and restore the drawing's full auto-fit extent. Only consulted when no clipPolygon is supplied in the same call - supplying a clipPolygon always enables clipping. Setting it to true without a clipPolygon merely re-enables the clip polygon already stored on the Drawing.",
+     "type": "boolean"
+    },
+    "isInNumbering": {
+     "description": "Whether the drawing is included in the automatic drawing numbering sequence.",
+     "type": "boolean"
+    },
+    "modelOffset": {
+     "$ref": "#/Coordinate2D",
+     "description": "Offset of the model origin within the drawing."
+    },
+    "nameType": {
+     "$ref": "#/DrawingNameType"
+    },
+    "numberingType": {
+     "$ref": "#/DrawingNumberingType"
+    },
+    "pos": {
+     "$ref": "#/Coordinate2D",
+     "description": "Position of the drawing's reference point on the layout."
+    },
+    "ratio": {
+     "description": "Scale ratio applied to the drawing relative to its source view.",
+     "type": "number"
+    },
+    "titleLibraryPartIndex": {
+     "description": "Library part index of the drawing title (API_DrawingTitle::libInd). A negative/invalid index means no title object is instantiated; setting it to a valid index (e.g. copied from another drawing) makes Archicad create the title's own placed element.",
+     "type": "number"
+    }
+   },
+   "type": "object"
+  },
+  "ElementDetailsField": {
+   "description": "A field of the details of an element.",
+   "enum": [
+    "type",
+    "id",
+    "floorIndex",
+    "layerIndex",
+    "drawIndex",
+    "details",
+    "floorPlanPolygons",
+    "hotlinkId"
+   ],
+   "type": "string"
+  },
+  "ElementId": {
+   "additionalProperties": false,
+   "description": "The identifier of an element.",
+   "properties": {
+    "guid": {
+     "$ref": "#/Guid"
+    }
+   },
+   "required": [
+    "guid"
+   ],
+   "type": "object"
+  },
+  "ElementIdArrayItem": {
+   "additionalProperties": false,
+   "properties": {
+    "elementId": {
+     "$ref": "#/ElementId"
+    }
+   },
+   "required": [
+    "elementId"
+   ],
+   "type": "object"
+  },
+  "ElementIdOrError": {
+   "description": "An element identifier or an error.",
+   "oneOf": [
+    {
+     "$ref": "#/ElementIdArrayItem"
+    },
+    {
+     "$ref": "#/ErrorItem"
+    }
+   ],
+   "type": "object"
+  },
+  "ElementIdsOrErrors": {
+   "description": "A list of element identifiers or errors.",
+   "items": {
+    "$ref": "#/ElementIdOrError"
+   },
+   "type": "array"
+  },
+  "ElementType": {
+   "description": "The type of an element.",
+   "enum": [
+    "Wall",
+    "Column",
+    "Beam",
+    "Window",
+    "Door",
+    "Object",
+    "Lamp",
+    "Slab",
+    "Roof",
+    "Mesh",
+    "Dimension",
+    "RadialDimension",
+    "LevelDimension",
+    "AngleDimension",
+    "Text",
+    "Label",
+    "Zone",
+    "Hatch",
+    "Line",
+    "PolyLine",
+    "Arc",
+    "Circle",
+    "Spline",
+    "Hotspot",
+    "CutPlane",
+    "Camera",
+    "CamSet",
+    "Group",
+    "SectElem",
+    "Drawing",
+    "Picture",
+    "Detail",
+    "Elevation",
+    "InteriorElevation",
+    "Worksheet",
+    "Hotlink",
+    "CurtainWall",
+    "CurtainWallSegment",
+    "CurtainWallFrame",
+    "CurtainWallPanel",
+    "CurtainWallJunction",
+    "CurtainWallAccessory",
+    "Shell",
+    "Skylight",
+    "Morph",
+    "ChangeMarker",
+    "Stair",
+    "Riser",
+    "Tread",
+    "StairStructure",
+    "Railing",
+    "RailingToprail",
+    "RailingHandrail",
+    "RailingRail",
+    "RailingPost",
+    "RailingInnerPost",
+    "RailingBaluster",
+    "RailingPanel",
+    "RailingSegment",
+    "RailingNode",
+    "RailingBalusterSet",
+    "RailingPattern",
+    "RailingToprailEnd",
+    "RailingHandrailEnd",
+    "RailingRailEnd",
+    "RailingToprailConnection",
+    "RailingHandrailConnection",
+    "RailingRailConnection",
+    "RailingEndFinish",
+    "BeamSegment",
+    "ColumnSegment",
+    "Opening",
+    "Unknown"
+   ],
+   "type": "string"
+  },
+  "Elements": {
+   "description": "A list of elements.",
+   "items": {
+    "$ref": "#/ElementIdArrayItem"
+   },
+   "type": "array"
+  },
+  "Error": {
+   "additionalProperties": false,
+   "description": "The details of an error.",
+   "properties": {
+    "code": {
+     "description": "The code of the error.",
+     "type": "integer"
+    },
+    "message": {
+     "description": "The error message.",
+     "type": "string"
+    }
+   },
+   "required": [
+    "code",
+    "message"
+   ],
+   "type": "object"
+  },
+  "ErrorItem": {
+   "additionalProperties": false,
+   "properties": {
+    "error": {
+     "$ref": "#/Error"
+    }
+   },
+   "required": [
+    "error"
+   ],
+   "type": "object"
+  },
+  "ExecutionResult": {
+   "description": "The result of the execution.",
+   "oneOf": [
+    {
+     "$ref": "#/SuccessfulExecutionResult"
+    },
+    {
+     "$ref": "#/FailedExecutionResult"
+    }
+   ],
+   "type": "object"
+  },
+  "ExecutionResults": {
+   "description": "A list of execution results.",
+   "items": {
+    "$ref": "#/ExecutionResult"
+   },
+   "type": "array"
+  },
+  "FailedExecutionResult": {
+   "additionalProperties": false,
+   "description": "The result of a failed execution.",
+   "properties": {
+    "error": {
+     "$ref": "#/Error"
+    },
+    "success": {
+     "enum": [
+      false
+     ],
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "success",
+    "error"
+   ],
+   "type": "object"
+  },
+  "FloorFill": {
+   "additionalProperties": false,
+   "description": "Floor plan cover fill settings of a Slab. When modifying an element, omitted properties keep their current values.",
+   "properties": {
+    "backgroundPen": {
+     "type": "integer"
+    },
+    "fillId": {
+     "$ref": "#/AttributeId"
+    },
+    "foregroundPen": {
+     "type": "integer"
+    },
+    "orientation": {
+     "$ref": "#/HatchOrientation"
+    },
+    "use": {
+     "description": "Whether the cover fill is shown on the floor plan.",
+     "type": "boolean"
+    },
+    "use3DHatching": {
+     "description": "Use Vectorial 3D Hatch patterns in Floor Plan view, taken from the top side material.",
+     "type": "boolean"
+    }
+   },
+   "type": "object"
+  },
+  "Guid": {
+   "description": "A Globally Unique Identifier (or Universally Unique Identifier) in its string representation as defined in RFC 4122.",
+   "format": "uuid",
+   "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+   "type": "string"
+  },
+  "HatchOrientation": {
+   "additionalProperties": false,
+   "description": "Orientation and distortion parameters of a fill. When modifying an element, omitted properties keep their current values.",
+   "properties": {
+    "innerRadius": {
+     "description": "Radius for circular fill distortion, used when type is Centered.",
+     "type": "number"
+    },
+    "matrix00": {
+     "description": "X component of the primary distortion (direction) vector.",
+     "type": "number"
+    },
+    "matrix01": {
+     "description": "X component of the secondary distortion vector.",
+     "type": "number"
+    },
+    "matrix10": {
+     "description": "Y component of the primary distortion (direction) vector.",
+     "type": "number"
+    },
+    "matrix11": {
+     "description": "Y component of the secondary distortion vector.",
+     "type": "number"
+    },
+    "origin": {
+     "$ref": "#/Coordinate2D",
+     "description": "The origin of the fill relative to the project origin."
+    },
+    "type": {
+     "$ref": "#/HatchOrientationType"
+    }
+   },
+   "type": "object"
+  },
+  "HatchOrientationType": {
+   "enum": [
+    "Global",
+    "Rotated",
+    "Distorted",
+    "Centered"
+   ],
+   "type": "string"
+  },
+  "HatchSettings": {
+   "additionalProperties": false,
+   "description": "Settings for modifying a Hatch. Setting coordinates replaces the entire polygon (outline plus optional holes) and may change the number of vertices.",
+   "properties": {
+    "arcs": {
+     "items": {
+      "$ref": "#/PolyArc"
+     },
+     "type": "array"
+    },
+    "backgroundColor": {
+     "$ref": "#/ColorRGB",
+     "description": "RGB color (components between 0.0 and 1.0) of the fill background, used instead of fillBackgroundPenIndex. Takes precedence over fillBackgroundPenIndex when both are given."
+    },
+    "buildingMaterialId": {
+     "$ref": "#/AttributeId"
+    },
+    "contourPenIndex": {
+     "type": "integer"
+    },
+    "coordinates": {
+     "items": {
+      "$ref": "#/Coordinate2D"
+     },
+     "minItems": 3,
+     "type": "array"
+    },
+    "fillBackgroundPenIndex": {
+     "description": "Setting a pen removes the backgroundColor override, so the pen shows.",
+     "type": "integer"
+    },
+    "fillId": {
+     "$ref": "#/AttributeId"
+    },
+    "fillPenIndex": {
+     "description": "Setting a pen removes the foregroundColor override, so the pen shows.",
+     "type": "integer"
+    },
+    "foregroundColor": {
+     "$ref": "#/ColorRGB",
+     "description": "RGB color (components between 0.0 and 1.0) of the fill foreground, used instead of fillPenIndex. Takes precedence over fillPenIndex when both are given."
+    },
+    "holes": {
+     "$ref": "#/Holes2D"
+    },
+    "roomSpecial": {
+     "type": "integer"
+    },
+    "showArea": {
+     "type": "boolean"
+    }
+   },
+   "required": [],
+   "type": "object"
+  },
+  "Hole2D": {
+   "additionalProperties": false,
+   "description": "A 2D hole in an element defined by closed polylines. The outline is given in 'polygonOutline'; 'polygonCoordinates' is accepted as a legacy alias.",
+   "oneOf": [
+    {
+     "required": [
+      "polygonOutline"
+     ]
+    },
+    {
+     "required": [
+      "polygonCoordinates"
+     ]
+    }
+   ],
+   "properties": {
+    "polygonArcs": {
+     "description": "Polygon outline arcs of the hole.",
+     "items": {
+      "$ref": "#/PolyArc"
+     },
+     "type": "array"
+    },
+    "polygonCoordinates": {
+     "description": "Legacy alias of polygonOutline.",
+     "items": {
+      "$ref": "#/Coordinate2D"
+     },
+     "minItems": 3,
+     "type": "array"
+    },
+    "polygonOutline": {
+     "description": "The 2D coordinates of the edge of the hole.",
+     "items": {
+      "$ref": "#/Coordinate2D"
+     },
+     "minItems": 3,
+     "type": "array"
+    }
+   },
+   "type": "object"
+  },
+  "Hole3D": {
+   "additionalProperties": false,
+   "description": "A 3D hole in an element defined by closed polylines",
+   "properties": {
+    "polygonArcs": {
+     "description": "Polygon outline arcs of the hole.",
+     "items": {
+      "$ref": "#/PolyArc"
+     },
+     "type": "array"
+    },
+    "polygonCoordinates": {
+     "description": "The 3D coordinates of the polygon of the hole.",
+     "items": {
+      "$ref": "#/Coordinate3D"
+     },
+     "minItems": 3,
+     "type": "array"
+    }
+   },
+   "required": [
+    "polygonCoordinates"
+   ],
+   "type": "object"
+  },
+  "Holes2D": {
+   "description": "A list of 2D holes in an element defined by closed polylines",
+   "items": {
+    "$ref": "#/Hole2D"
+   },
+   "type": "array"
+  },
+  "Holes3D": {
+   "description": "A list of 3D holes in an element defined by closed polylines",
+   "items": {
+    "$ref": "#/Hole3D"
+   },
+   "type": "array"
+  },
+  "HotlinkDetails": {
+   "additionalProperties": false,
+   "description": "Details of a placed hotlink instance: which node it comes from and where it sits.",
+   "properties": {
+    "adjustLevelDiffs": {
+     "type": "boolean"
+    },
+    "floorDifference": {
+     "type": "integer"
+    },
+    "hotlinkNodeId": {
+     "$ref": "#/HotlinkNodeId"
+    },
+    "hotlinkType": {
+     "$ref": "#/HotlinkType"
+    },
+    "ignoreTopFloorLinks": {
+     "type": "boolean"
+    },
+    "mirrored": {
+     "description": "True when the module's local X axis is reflected.",
+     "type": "boolean"
+    },
+    "origin": {
+     "$ref": "#/Coordinate3D"
+    },
+    "relinkWallOpenings": {
+     "type": "boolean"
+    },
+    "rotationAngle": {
+     "description": "Counter-clockwise rotation about the origin, in radians.",
+     "type": "number"
+    },
+    "skipNested": {
+     "type": "boolean"
+    },
+    "suspendFixAngle": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "hotlinkType",
+    "hotlinkNodeId",
+    "origin",
+    "rotationAngle",
+    "mirrored"
+   ],
+   "type": "object"
+  },
+  "HotlinkNodeId": {
+   "additionalProperties": false,
+   "description": "The identifier of a hotlink node - the reference to a module source file, which instances are placed from.",
+   "properties": {
+    "guid": {
+     "$ref": "#/Guid"
+    }
+   },
+   "required": [
+    "guid"
+   ],
+   "type": "object"
+  },
+  "HotlinkType": {
+   "description": "Module or XRef.",
+   "enum": [
+    "Module",
+    "XRef"
+   ],
+   "type": "string"
+  },
+  "HotspotSettings": {
+   "additionalProperties": false,
+   "description": "Settings for modifying a Hotspot.",
+   "properties": {
+    "height": {
+     "type": "number"
+    },
+    "penIndex": {
+     "type": "integer"
+    },
+    "position": {
+     "$ref": "#/Coordinate2D"
+    }
+   },
+   "required": [],
+   "type": "object"
+  },
+  "Justification": {
+   "description": "Text justification.",
+   "enum": [
+    "Left",
+    "Center",
+    "Right",
+    "Full"
+   ],
+   "type": "string"
+  },
+  "LabelArrowType": {
+   "description": "Arrow head shape for a Label's leader line.",
+   "enum": [
+    "EmptyCircle",
+    "CrossCircle",
+    "FullCircle",
+    "SlashLine15",
+    "OpenArrow15",
+    "ClosedArrow15",
+    "FullArrow15",
+    "SlashLine30",
+    "OpenArrow30",
+    "ClosedArrow30",
+    "FullArrow30",
+    "SlashLine45",
+    "OpenArrow45",
+    "ClosedArrow45",
+    "FullArrow45",
+    "SlashLine60",
+    "OpenArrow60",
+    "ClosedArrow60",
+    "FullArrow60",
+    "SlashLine90",
+    "PepitaCircle",
+    "BandArrow",
+    "HalfArrowCcw15",
+    "HalfArrowCw15",
+    "HalfArrowCcw30",
+    "HalfArrowCw30",
+    "HalfArrowCcw45",
+    "HalfArrowCw45",
+    "HalfArrowCcw60",
+    "HalfArrowCw60",
+    "SlashLine75"
+   ],
+   "type": "string"
+  },
+  "LabelClass": {
+   "description": "Whether this is a textual or a symbol label.",
+   "enum": [
+    "Text",
+    "Symbol"
+   ],
+   "type": "string"
+  },
+  "LabelDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "begCoordinate": {
+     "$ref": "#/Coordinate2D"
+    },
+    "endCoordinate": {
+     "$ref": "#/Coordinate2D"
+    },
+    "hasLeaderLine": {
+     "type": "boolean"
+    },
+    "labelClass": {
+     "$ref": "#/LabelClass"
+    },
+    "leaderLine": {
+     "$ref": "#/LabelLeaderLineDetails"
+    },
+    "libPart": {
+     "$ref": "#/LibPartDetails"
+    },
+    "midCoordinate": {
+     "$ref": "#/Coordinate2D"
+    },
+    "ownerElementId": {
+     "$ref": "#/ElementId"
+    },
+    "ownerElementType": {
+     "$ref": "#/ElementType"
+    },
+    "paragraphCount": {
+     "description": "Present only when labelClass is 'Text'. Read-only: number of paragraphs in the memo (Tapir's own Create/Modify commands always produce 1).",
+     "type": "integer"
+    },
+    "runs": {
+     "description": "Present only when labelClass is 'Text' and the content has paragraphs (always for content Tapir created): one entry per styled run, a single run too.",
+     "items": {
+      "$ref": "#/TextRunDetails"
+     },
+     "type": "array"
+    },
+    "style": {
+     "$ref": "#/TextStyleDetails",
+     "description": "Present only when labelClass is 'Text'."
+    },
+    "symbolStyle": {
+     "$ref": "#/LabelSymbolStyleSettableDetails",
+     "description": "Present only when labelClass is 'Symbol'."
+    },
+    "text": {
+     "description": "Present only when labelClass is 'Text'.",
+     "type": "string"
+    }
+   },
+   "required": [
+    "begCoordinate",
+    "midCoordinate",
+    "endCoordinate",
+    "hasLeaderLine",
+    "labelClass",
+    "leaderLine"
+   ],
+   "type": "object"
+  },
+  "LabelLeaderLineAnchorPoint": {
+   "description": "How the leader line connects to the label text.",
+   "enum": [
+    "Middle",
+    "Top",
+    "Bottom",
+    "Underlined"
+   ],
+   "type": "string"
+  },
+  "LabelLeaderLineDetails": {
+   "additionalProperties": false,
+   "description": "Full readable leader-line/frame state of a Label: every field of LabelLeaderLineSettableDetails plus the leader line's coordinates.",
+   "properties": {
+    "anchorPoint": {
+     "$ref": "#/LabelLeaderLineAnchorPoint",
+     "description": "Only applies to text-class labels."
+    },
+    "arrowPenIndex": {
+     "type": "integer"
+    },
+    "arrowSize": {
+     "description": "Arrow size in mm.",
+     "type": "number"
+    },
+    "arrowType": {
+     "$ref": "#/LabelArrowType"
+    },
+    "arrowVisible": {
+     "type": "boolean"
+    },
+    "begCoordinate": {
+     "$ref": "#/Coordinate2D"
+    },
+    "contourOffset": {
+     "description": "Padding between the Label's frame and its content, in mm.",
+     "type": "number"
+    },
+    "endCoordinate": {
+     "$ref": "#/Coordinate2D"
+    },
+    "framed": {
+     "description": "Put a frame around the content.",
+     "type": "boolean"
+    },
+    "hasLeaderLine": {
+     "description": "Whether the Label has a leader line (pointer line).",
+     "type": "boolean"
+    },
+    "hideWithBaseElem": {
+     "description": "Hide the label together with its parent element.",
+     "type": "boolean"
+    },
+    "leaderShape": {
+     "description": "Shape of the leader line.",
+     "enum": [
+      "Segmented",
+      "Splinear",
+      "SquareRoot"
+     ],
+     "type": "string"
+    },
+    "lineTypeId": {
+     "$ref": "#/AttributeId",
+     "description": "Line type attribute of the leader line."
+    },
+    "midCoordinate": {
+     "$ref": "#/Coordinate2D"
+    },
+    "penIndex": {
+     "description": "Pen attribute index of the leader line.",
+     "type": "integer"
+    },
+    "squareRootAngle": {
+     "description": "Angle in radians, used only when leaderShape is 'SquareRoot'. Valid range 1-179 degrees.",
+     "type": "number"
+    }
+   },
+   "type": "object"
+  },
+  "LabelSymbolStyleSettableDetails": {
+   "additionalProperties": false,
+   "description": "Every user-configurable style setting specific to a Symbol-class Label (top-level API_LabelType fields documented as 'for symbol labels only'). Shared by CreateLabels ('symbolStyle'), ModifyLabels ('symbolStyle'), and the Get response.",
+   "properties": {
+    "backgroundFillPenIndex": {
+     "description": "Effective only if useBackgroundFill is true.",
+     "type": "integer"
+    },
+    "bold": {
+     "type": "boolean"
+    },
+    "effectProtected": {
+     "type": "boolean"
+    },
+    "effectStrikeout": {
+     "type": "boolean"
+    },
+    "effectSubscript": {
+     "type": "boolean"
+    },
+    "effectSuperscript": {
+     "type": "boolean"
+    },
+    "flipEnabled": {
+     "description": "'Always Readable' toggle.",
+     "type": "boolean"
+    },
+    "fontIndex": {
+     "description": "Font attribute index.",
+     "type": "integer"
+    },
+    "fontName": {
+     "description": "Name of the font, as the Font attributes carry it. On input resolved to the font's index like a Text style's fontName, taking precedence over fontIndex, and failing when no loaded font has the name; on read-back the name of the font fontIndex refers to, absent when no loaded font has that index.",
+     "type": "string"
+    },
+    "italic": {
+     "type": "boolean"
+    },
+    "nonBreaking": {
+     "description": "'Wrap Text' turned off when true.",
+     "type": "boolean"
+    },
+    "textSize": {
+     "description": "Character height in mm.",
+     "type": "number"
+    },
+    "textWay": {
+     "$ref": "#/SymbolLabelTextDirection"
+    },
+    "underline": {
+     "type": "boolean"
+    },
+    "useBackgroundFill": {
+     "type": "boolean"
+    }
+   },
+   "type": "object"
+  },
+  "LevelDimensionDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "angle": {
+     "description": "Rotation angle of the marker in radians.",
+     "type": "number"
+    },
+    "dimForm": {
+     "description": "Marker type 0-19.",
+     "type": "integer"
+    },
+    "level": {
+     "description": "The level the dimension shows in meters: the height of the owner element at the position for an associative level dimension, the floor level or the static value otherwise.",
+     "type": "number"
+    },
+    "markerSize": {
+     "description": "Size of the marker in millimeters.",
+     "type": "number"
+    },
+    "needPlus": {
+     "type": "boolean"
+    },
+    "origin": {
+     "$ref": "#/DimensionOrigin"
+    },
+    "ownerElementId": {
+     "$ref": "#/ElementId",
+     "description": "Present only for an associative level dimension: the element it measures."
+    },
+    "ownerElementType": {
+     "$ref": "#/ElementType",
+     "description": "Present only for an associative level dimension."
+    },
+    "pen": {
+     "type": "integer"
+    },
+    "position": {
+     "$ref": "#/Coordinate2D",
+     "description": "The location of the marker."
+    },
+    "staticLevel": {
+     "description": "The static flag as Archicad reports it. A level dimension created with a fixed 'level' and no parent keeps that value although Archicad reads this flag as false.",
+     "type": "boolean"
+    },
+    "textHeight": {
+     "description": "Height of the dimension text in millimeters.",
+     "type": "number"
+    },
+    "textPen": {
+     "type": "integer"
+    }
+   },
+   "required": [
+    "position",
+    "level",
+    "staticLevel",
+    "dimForm",
+    "needPlus",
+    "pen",
+    "textHeight",
+    "textPen",
+    "markerSize",
+    "angle",
+    "origin"
+   ],
+   "type": "object"
+  },
+  "LibPartBasedElementDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "libPart": {
+     "$ref": "#/LibPartDetails"
+    },
+    "ownerElementId": {
+     "$ref": "#/ElementId"
+    },
+    "ownerElementType": {
+     "$ref": "#/ElementType"
+    }
+   },
+   "required": [
+    "libPart"
+   ],
+   "type": "object"
+  },
+  "LibPartDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "name": {
+     "type": "string"
+    },
+    "ownUnID": {
+     "$ref": "#/LibPartUnId"
+    },
+    "parentUnID": {
+     "$ref": "#/LibPartUnId"
+    }
+   },
+   "required": [
+    "name",
+    "parentUnID",
+    "ownUnID"
+   ]
+  },
+  "LibPartUnId": {
+   "additionalProperties": false,
+   "properties": {
+    "guid": {
+     "$ref": "#/Guid"
+    }
+   },
+   "required": [
+    "guid"
+   ],
+   "type": "object"
+  },
+  "LineSettings": {
+   "additionalProperties": false,
+   "description": "Settings for modifying a Line.",
+   "properties": {
+    "begCoordinate": {
+     "$ref": "#/Coordinate2D"
+    },
+    "endCoordinate": {
+     "$ref": "#/Coordinate2D"
+    },
+    "linePenIndex": {
+     "type": "integer"
+    },
+    "lineTypeId": {
+     "$ref": "#/AttributeId"
+    },
+    "roomSeparator": {
+     "type": "boolean"
+    }
+   },
+   "required": [],
+   "type": "object"
+  },
+  "LinkToSettings": {
+   "additionalProperties": false,
+   "description": "Mode of linking an element to its home story.",
+   "properties": {
+    "homeStoryDifference": {
+     "description": "Difference of the home story from the current story.",
+     "type": "integer"
+    },
+    "newCreationMode": {
+     "description": "Controls home-story selection during element creation. If true, homeStoryDifference selects the home story relative to the current story and the element's absolute floor index is ignored. If false, the absolute floor index is used and Archicad fills homeStoryDifference. This is a creation instruction, not a persistent linking mode.",
+     "type": "boolean"
+    }
+   },
+   "type": "object"
+  },
+  "ManualZoneGeometry": {
+   "additionalProperties": false,
+   "description": "Manual zone placement.",
+   "properties": {
+    "holes": {
+     "$ref": "#/Holes2D"
+    },
+    "polygonArcs": {
+     "description": "Polygon outline arcs of the zone.",
+     "items": {
+      "$ref": "#/PolyArc"
+     },
+     "type": "array"
+    },
+    "polygonCoordinates": {
+     "description": "The 2D coordinates of the edge of the zone.",
+     "items": {
+      "$ref": "#/Coordinate2D"
+     },
+     "minItems": 3,
+     "type": "array"
+    }
+   },
+   "required": [
+    "polygonCoordinates"
+   ],
+   "type": "object"
+  },
+  "MeshDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "contourPen": {
+     "description": "Pen attribute index for the mesh contour line.",
+     "type": "integer"
+    },
+    "floorIndex": {
+     "description": "The index of the story the mesh is placed on.",
+     "type": "integer"
+    },
+    "holes": {
+     "$ref": "#/Holes3D"
+    },
+    "level": {
+     "description": "The Z reference level of coordinates.",
+     "type": "number"
+    },
+    "levelPen": {
+     "description": "Pen attribute index for the mesh level lines.",
+     "type": "integer"
+    },
+    "lineTypeIndex": {
+     "description": "Line type attribute index for the mesh contour.",
+     "type": "integer"
+    },
+    "polygonArcs": {
+     "description": "Polygon outline arcs of the mesh.",
+     "items": {
+      "$ref": "#/PolyArc"
+     },
+     "type": "array"
+    },
+    "polygonCoordinates": {
+     "description": "The 3D coordinates of the outline polygon of the mesh.",
+     "items": {
+      "$ref": "#/Coordinate3D"
+     },
+     "minItems": 3,
+     "type": "array"
+    },
+    "ridges": {
+     "$ref": "#/MeshRidges"
+    },
+    "showLines": {
+     "description": "Whether to show secondary mesh lines on plan.",
+     "type": "boolean"
+    },
+    "skirtLevel": {
+     "description": "The height of the skirt.",
+     "type": "number"
+    },
+    "skirtType": {
+     "$ref": "#/MeshSkirtType"
+    },
+    "sublines": {
+     "description": "The leveling sublines inside the polygon of the mesh.",
+     "items": {
+      "$ref": "#/MeshSubline"
+     },
+     "minItems": 1,
+     "type": "array"
+    }
+   },
+   "required": [
+    "level",
+    "skirtType",
+    "skirtLevel",
+    "polygonCoordinates"
+   ],
+   "type": "object"
+  },
+  "MeshRidges": {
+   "description": "How ridges between mesh facets are displayed in 3D: 'AllSharp' shows all ridges, 'AllSmooth' hides them, 'UserDefined' shows only ridges along user-defined level lines (the drawing-set look for contour-line topography).",
+   "enum": [
+    "AllSharp",
+    "AllSmooth",
+    "UserDefined"
+   ],
+   "type": "string"
+  },
+  "MeshSkirtType": {
+   "description": "The type of the skirt structure.",
+   "enum": [
+    "SurfaceOnlyWithoutSkirt",
+    "WithSkirt",
+    "SolidBodyWithSkirt"
+   ],
+   "type": "string"
+  },
+  "MeshSubline": {
+   "additionalProperties": false,
+   "properties": {
+    "coordinates": {
+     "description": "The 3D coordinates of the leveling subline of the mesh.",
+     "items": {
+      "$ref": "#/Coordinate3D"
+     },
+     "type": "array"
+    }
+   },
+   "required": [
+    "coordinates"
+   ],
+   "type": "object"
+  },
+  "MorphBody": {
+   "additionalProperties": false,
+   "description": "A Morph's full body geometry: an indexed vertex list plus one entry per face (polygon). Shared shape between GetDetailsOfElements' output and CreateMorphs/ModifyMorphs' input - what Get reports is what Create/Modify accept back. There is no fillet/chamfer operation in the Archicad API - a caller wanting rounded geometry must supply the already-tessellated facets here; edgeOverrides only controls how an existing straight edge is DISPLAYED (hidden/visible/smooth-shaded), not its shape.",
+   "properties": {
+    "bodyType": {
+     "description": "Whether the body is a closed solid or an open surface shell. Reported accurately on Get; on Create/Modify this is set on the element but a confirmed Archicad SDK bug means it may not take effect (bodyType has been observed always coming back Solid regardless of what was requested - see edgeOverrides' note).",
+     "enum": [
+      "Solid",
+      "Surface"
+     ],
+     "type": "string"
+    },
+    "edgeDefault": {
+     "description": "Default display status for every edge that has no entry in edgeOverrides. Reported accurately on Get. On Create/Modify it takes effect from Archicad 29 on, where it is applied to every edge of the element with ACAPI_Element_ChangeMorphEdgeType right after the element is created or changed (e.g. 'HardHidden' hides all edges of a triangulated body). On Archicad 28 and earlier it is set on the element but does not take effect due to the same confirmed Archicad SDK bug as edgeOverrides (element.morph.edgeType is silently discarded by ACAPI_Element_Create/Change).",
+     "enum": [
+      "HardVisible",
+      "HardHidden",
+      "SoftHidden"
+     ],
+     "type": "string"
+    },
+    "edgeOverrides": {
+     "description": "READ-ONLY in practice: reported accurately by GetDetailsOfElements (reflecting whatever Archicad itself currently has), but CreateMorphs/ModifyMorphs silently ignore this field on input - per-edge display status cannot be set by an add-on due to a confirmed, still-unresolved Archicad SDK bug (element.morph.edgeType/bodyType are silently discarded by ACAPI_Element_Create/Change; see the GRAPHISOFT community forum thread 'Help with setting morph's hidden edges in the API'). To hide or smooth ALL edges of a Morph use edgeDefault, which does take effect from Archicad 29 on. Sparse when present - only edges whose display status differs from edgeDefault get an entry. Identifies an edge by the (unordered) pair of vertex indices it connects.",
+     "items": {
+      "additionalProperties": false,
+      "properties": {
+       "hidden": {
+        "description": "Hide this edge's line entirely.",
+        "type": "boolean"
+       },
+       "silhouetteOnly": {
+        "description": "Show this edge's line only where it forms a silhouette/contour from the current viewpoint.",
+        "type": "boolean"
+       },
+       "smooth": {
+        "description": "Shade the two adjacent faces smoothly across this edge instead of as a hard crease - the 'aide a la courbe' rounded-look hint. Does not change actual geometry.",
+        "type": "boolean"
+       },
+       "vertexIds": {
+        "items": {
+         "type": "integer"
+        },
+        "maxItems": 2,
+        "minItems": 2,
+        "type": "array"
+       }
+      },
+      "required": [
+       "vertexIds"
+      ],
+      "type": "object"
+     },
+     "type": "array"
+    },
+    "isClosed": {
+     "description": "READ-ONLY, Get output only (ignored if sent to Create/Modify). Geometrically computed (Modeler::MeshBody::IsClosedBody): true if every edge in the body has exactly two adjacent faces (a watertight/manifold volume), false if any edge borders only one face (an open shell / has holes or gaps). Distinct from bodyType, which is the caller's declared INTENT (Solid vs Surface) rather than the actual computed geometry - a body can be declared bodyType 'Solid' yet still be geometrically open if a face is missing.",
+     "type": "boolean"
+    },
+    "polygons": {
+     "description": "One entry per face loop (into `vertices`), counterclockwise as seen from outside the body. Optional - a body made entirely of wireEdges (see below) needs none. Set \"filled\": false on an entry to create only that loop's edges (e.g. the outline of a pyramid's side faces) without an actual filled face.",
+     "items": {
+      "$ref": "#/MorphPolygon"
+     },
+     "type": "array"
+    },
+    "vertices": {
+     "description": "Flat, indexed vertex list, local to the Morph's own placement (not world coordinates). A Solid body needs at least 4 (a tetrahedron, the minimum closed volume); a Surface body has no closedness requirement at all - the minimum is 2 vertices joined by a single wireEdge (a lone vertex with no edge at all is rejected by Archicad itself, confirmed live) - enforced with a bodyType-aware error message, not by this minItems floor alone.",
+     "items": {
+      "$ref": "#/Coordinate3D"
+     },
+     "minItems": 2,
+     "type": "array"
+    },
+    "wireEdges": {
+     "description": "Standalone edges that belong to no face at all (e.g. a bare rectangle outline, or a pyramid with a filled base but wireframe-only sides - set \"filled\": false on a polygons entry for a whole closed loop like that instead, this is for individual edges not already covered by any polygon loop). Reported accurately by GetDetailsOfElements (every edge with zero adjacent faces); accepted back by CreateMorphs/ModifyMorphs. Identifies an edge by the (unordered) pair of vertex indices it connects - reuses whatever edge already exists between those two vertices if the polygons above happen to share it.",
+     "items": {
+      "additionalProperties": false,
+      "properties": {
+       "vertexIds": {
+        "items": {
+         "type": "integer"
+        },
+        "maxItems": 2,
+        "minItems": 2,
+        "type": "array"
+       }
+      },
+      "required": [
+       "vertexIds"
+      ],
+      "type": "object"
+     },
+     "type": "array"
+    }
+   },
+   "required": [
+    "vertices"
+   ],
+   "type": "object"
+  },
+  "MorphDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "body": {
+     "$ref": "#/MorphBody"
+    },
+    "buildingMaterialId": {
+     "$ref": "#/AttributeId",
+     "description": "The Morph's building material - a single, whole-volume property (what the mass is 'made of', governing cut-fill/quantity takeoff), NOT settable per face. Per-face appearance is controlled separately by each polygon's own surfaceId (see MorphBody) - confirmed live these are two independent, unrelated attributes (a Morph can have one uniform building material while showing a different Surface finish on each face)."
+    },
+    "castShadow": {
+     "description": "Whether the body casts shadow in 3D.",
+     "type": "boolean"
+    },
+    "coverFillBGPen": {
+     "description": "Floor plan fill background pen.",
+     "type": "integer"
+    },
+    "coverFillOrientation": {
+     "$ref": "#/CoverFillOrientation"
+    },
+    "coverFillPen": {
+     "description": "Floor plan fill foreground pen.",
+     "type": "integer"
+    },
+    "coverFillType": {
+     "$ref": "#/AttributeId",
+     "description": "Floor plan fill type (only used when useCoverFillType is true)."
+    },
+    "cutFillBackgroundPen": {
+     "description": "Overridden cut fill background pen (otherwise inherited from the building material). Omit to leave uninherited/unset.",
+     "type": "integer"
+    },
+    "cutFillPen": {
+     "description": "Overridden cut fill foreground pen (otherwise inherited from the building material). Omit to leave uninherited/unset.",
+     "type": "integer"
+    },
+    "cutLinePen": {
+     "description": "Pen of the cut contour.",
+     "type": "integer"
+    },
+    "cutLineType": {
+     "$ref": "#/AttributeId",
+     "description": "Line type of the cut contour."
+    },
+    "displayOption": {
+     "$ref": "#/DisplayOption"
+    },
+    "isAutoOnStoryVisibility": {
+     "description": "When true, the per-story visibility (showContour/showFill) is calculated automatically from the Morph's vertical extent instead of using the explicit values.",
+     "type": "boolean"
+    },
+    "level": {
+     "description": "Z position of the free shape relative to the floor level. Reported accurately on Get, but a confirmed Archicad SDK bug means it may not take effect on Create/Modify (same class of bug as bodyType/edgeType - see MorphBody's notes).",
+     "type": "number"
+    },
+    "linkToSettings": {
+     "$ref": "#/LinkToSettings"
+    },
+    "origin": {
+     "$ref": "#/Coordinate3D",
+     "description": "Translation component of the Morph's placement transform (tranmat's origin column)."
+    },
+    "outlineContourDisplay": {
+     "description": "Outline contour display.",
+     "type": "boolean"
+    },
+    "overheadLinePen": {
+     "description": "Pen of the overhead part (floor plan only).",
+     "type": "integer"
+    },
+    "overheadLineType": {
+     "$ref": "#/AttributeId",
+     "description": "Line type of the overhead part (floor plan only)."
+    },
+    "receiveShadow": {
+     "description": "Whether the body receives shadow in 3D.",
+     "type": "boolean"
+    },
+    "showContour": {
+     "$ref": "#/StoryVisibility",
+     "description": "Which stories display this Morph's contour. Reported accurately on Get, but confirmed live that Create/Modify do not reliably apply it (showAllBelow/showRelAbove/showRelBelow silently come back reset even when explicitly set and isAutoOnStoryVisibility is false) - the same class of confirmed Archicad SDK write bug as bodyType/edgeType/level (see MorphBody's notes). Set on the element regardless since doing so is harmless and forward-compatible."
+    },
+    "showFill": {
+     "$ref": "#/StoryVisibility",
+     "description": "Which stories display this Morph's floor plan fill. Same write-reliability caveat as showContour."
+    },
+    "surfaceId": {
+     "$ref": "#/AttributeId",
+     "description": "The Morph's own default Surface (element.morph.material) - used for any face that has no per-face surfaceId override of its own (see MorphBody polygons[].surfaceId). Distinct from buildingMaterialId (the whole-volume material). Confirmed live that Archicad silently discards this specific field when set through ACAPI_Element_Create alone (reproduced identically on Archicad 27 and 29 - not a version-specific issue, unlike polygons[].surfaceId below); CreateMorphs works around this transparently with an internal follow-up Change right after Create, so this field behaves correctly end-to-end despite the underlying quirk."
+    },
+    "textureProjectionCoords": {
+     "description": "Texture projection coordinate system: origin, then 3 axis endpoints.",
+     "items": {
+      "$ref": "#/Coordinate3D"
+     },
+     "maxItems": 4,
+     "minItems": 4,
+     "type": "array"
+    },
+    "textureProjectionType": {
+     "$ref": "#/TextureProjectionType"
+    },
+    "uncutLinePen": {
+     "description": "Pen of the (uncut) contour.",
+     "type": "integer"
+    },
+    "uncutLineType": {
+     "$ref": "#/AttributeId",
+     "description": "Line type of the (uncut) contour."
+    },
+    "use3DHatching": {
+     "description": "Derive the floor plan fill from the 3D material instead of coverFillType.",
+     "type": "boolean"
+    },
+    "useCoverFillType": {
+     "description": "Use a dedicated floor plan fill instead of the one from the building material.",
+     "type": "boolean"
+    },
+    "useDistortedCoverFill": {
+     "description": "Show the floor plan hatching as if projected onto a plane.",
+     "type": "boolean"
+    },
+    "viewDepthLimitation": {
+     "$ref": "#/ViewDepthLimitation"
+    },
+    "xAxis": {
+     "$ref": "#/Coordinate3D",
+     "description": "X axis of the Morph's placement transform (tranmat's first column). Omit on Create to get an identity rotation; give all three of xAxis/yAxis/zAxis together or none at all."
+    },
+    "yAxis": {
+     "$ref": "#/Coordinate3D",
+     "description": "Y axis of the Morph's placement transform (tranmat's second column). Give all three of xAxis/yAxis/zAxis together or none at all."
+    },
+    "zAxis": {
+     "$ref": "#/Coordinate3D",
+     "description": "Z axis of the Morph's placement transform (tranmat's third column). Give all three of xAxis/yAxis/zAxis together or none at all."
+    }
+   },
+   "required": [
+    "origin",
+    "body"
+   ],
+   "type": "object"
+  },
+  "MorphPolygon": {
+   "additionalProperties": false,
+   "properties": {
+    "filled": {
+     "description": "Defaults to true. Set to false to create only this loop's edges (a wireframe outline, e.g. a bare rectangle with no surface fill) without an actual face - holes/surfaceId are ignored in that case, since there is no fill for them to apply to.",
+     "type": "boolean"
+    },
+    "holes": {
+     "description": "Optional hole loops cut out of this face, each a clockwise list of vertex indices.",
+     "items": {
+      "$ref": "#/MorphPolygonHole"
+     },
+     "type": "array"
+    },
+    "surfaceId": {
+     "$ref": "#/AttributeId",
+     "description": "Optional per-face surface (render material) override. Uses the Morph's default surface when omitted. Ignored during creation in Archicad 25."
+    },
+    "vertexIds": {
+     "description": "Counterclockwise outer-loop vertex indices for this face.",
+     "items": {
+      "type": "integer"
+     },
+     "minItems": 3,
+     "type": "array"
+    }
+   },
+   "required": [
+    "vertexIds"
+   ],
+   "type": "object"
+  },
+  "MorphPolygonHole": {
+   "additionalProperties": false,
+   "properties": {
+    "vertexIds": {
+     "items": {
+      "type": "integer"
+     },
+     "minItems": 3,
+     "type": "array"
+    }
+   },
+   "required": [
+    "vertexIds"
+   ],
+   "type": "object"
+  },
+  "NavigatorItemId": {
+   "additionalProperties": false,
+   "description": "The identifier of a navigator item.",
+   "properties": {
+    "guid": {
+     "$ref": "#/Guid"
+    }
+   },
+   "required": [
+    "guid"
+   ],
+   "type": "object"
+  },
+  "NotYetSupportedElementTypeDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "error": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "error"
+   ],
+   "type": "object"
+  },
+  "ObjectDetails": {
+   "additionalProperties": false,
+   "description": "Shared shape for Object and Lamp elements (both use the same API_ObjectType struct). lightColor/lightIsOn only apply to Lamps. Per the Archicad SDK's own remarks, per-story visibility (visibility.showRelAbove/showRelBelow) and visibility.linkToSettings.newCreationMode were 'not extended' for Object/Lamp the way they were for other element types - still settable here for schema symmetry, but Archicad may silently ignore them.",
+   "properties": {
+    "angle": {
+     "type": "number"
+    },
+    "dimensions": {
+     "$ref": "#/Coordinate3D"
+    },
+    "fixPoint": {
+     "description": "0-based index of the hotspot to keep fixed when the object is resized (raw API_ObjectType.fixPoint value, not 1-based).",
+     "type": "integer"
+    },
+    "isAutoOnStoryVisibility": {
+     "description": "Recalculate per-story visibility automatically from the object's vertical extent ('All Relevant Stories').",
+     "type": "boolean"
+    },
+    "libPart": {
+     "$ref": "#/LibPartDetails"
+    },
+    "lightColor": {
+     "$ref": "#/ColorRGB",
+     "description": "Lamp only. Reported accurately here, but confirmed live that Archicad silently discards this value through both Create and Modify (always reports the library part's own default light color). lightIsOn (the on/off state) does not have this problem."
+    },
+    "lightIsOn": {
+     "description": "Lamp only.",
+     "type": "boolean"
+    },
+    "lineTypeId": {
+     "$ref": "#/AttributeId"
+    },
+    "linkToSettings": {
+     "$ref": "#/LinkToSettings"
+    },
+    "offset": {
+     "$ref": "#/Coordinate2D",
+     "description": "Offset of the symbol's origin from the insertion point. Reported accurately here, but confirmed live that Archicad silently discards this value through both Create and Modify (always reports the library part's own default hotspot offset regardless of what is sent) - same class of read-only-in-practice field as Morph's bodyType/edgeType/level."
+    },
+    "origin": {
+     "$ref": "#/Coordinate3D"
+    },
+    "ownerElementId": {
+     "$ref": "#/ElementId"
+    },
+    "ownerElementType": {
+     "$ref": "#/ElementType"
+    },
+    "pen": {
+     "type": "integer"
+    },
+    "reflected": {
+     "type": "boolean"
+    },
+    "sectionContourPen": {
+     "type": "integer"
+    },
+    "sectionFillBackgroundPen": {
+     "type": "integer"
+    },
+    "sectionFillId": {
+     "$ref": "#/AttributeId"
+    },
+    "sectionFillPen": {
+     "type": "integer"
+    },
+    "surfaceId": {
+     "$ref": "#/AttributeId",
+     "description": "Material/Surface override (API_ObjectType.mat)."
+    },
+    "useFixSize": {
+     "description": "Use the A/B (dimensions.x/dimensions.y) values as fixed sizes.",
+     "type": "boolean"
+    },
+    "useFixedAngle": {
+     "description": "Use a fixed rotation angle (API_ObjectType.fixedAngle - stored as Int32 in the API despite being boolean in practice). Reported accurately here, but confirmed live that Archicad silently discards this value through both Create and Modify.",
+     "type": "boolean"
+    },
+    "useObjectLineTypes": {
+     "description": "Use the line type defined in the library part instead of 'lineTypeId'.",
+     "type": "boolean"
+    },
+    "useObjectMaterials": {
+     "description": "Use the materials defined in the library part instead of 'surfaceId'.",
+     "type": "boolean"
+    },
+    "useObjectPens": {
+     "description": "Use the pen defined in the library part instead of 'pen'.",
+     "type": "boolean"
+    },
+    "useObjectSectionAttributes": {
+     "description": "Use the section attributes defined in the library part instead of 'sectionFillId'/'sectionFillPen'/'sectionFillBackgroundPen'/'sectionContourPen'.",
+     "type": "boolean"
+    },
+    "visibility": {
+     "$ref": "#/StoryVisibility"
+    }
+   },
+   "required": [
+    "libPart",
+    "origin",
+    "dimensions",
+    "angle"
+   ],
+   "type": "object"
+  },
+  "OverriddenMaterial": {
+   "additionalProperties": false,
+   "description": "A surface material that may override the one inherited from the element's structure (building material, composite or profile).",
+   "properties": {
+    "attributeId": {
+     "$ref": "#/AttributeId"
+    },
+    "overridden": {
+     "description": "True if the material is overridden on the element level.",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "overridden"
+   ],
+   "type": "object"
+  },
+  "OverriddenPen": {
+   "additionalProperties": false,
+   "description": "A pen index that may override the one inherited from the element's structure. On Archicad versions where the underlying element does not support this override, 'overridden' is always false.",
+   "properties": {
+    "overridden": {
+     "description": "True if the pen is overridden on the element level.",
+     "type": "boolean"
+    },
+    "penIndex": {
+     "type": "integer"
+    }
+   },
+   "required": [
+    "overridden"
+   ],
+   "type": "object"
+  },
+  "PolyArc": {
+   "additionalProperties": false,
+   "description": "Representation of an arc segment of a two dimensional polygon/polyline.",
+   "properties": {
+    "arcAngle": {
+     "description": "Angle of the arc; it is positive, if the arc is on the right-hand side of the straight segment.",
+     "type": "number"
+    },
+    "begIndex": {
+     "description": "Node index of one end point of the arc.",
+     "type": "integer"
+    },
+    "endIndex": {
+     "description": "Node index of the other end point of the arc.",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "begIndex",
+    "endIndex",
+    "arcAngle"
+   ],
+   "type": "object"
+  },
+  "PolylineDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "arcs": {
+     "description": "The arcs of the polyline.",
+     "items": {
+      "$ref": "#/PolyArc"
+     },
+     "type": "array"
+    },
+    "coordinates": {
+     "items": {
+      "$ref": "#/Coordinate2D"
+     },
+     "type": "array"
+    },
+    "linePenIndex": {
+     "type": "integer"
+    },
+    "lineTypeId": {
+     "$ref": "#/AttributeId"
+    },
+    "roomSeparator": {
+     "description": "Is this a zone boundary line?",
+     "type": "boolean"
+    },
+    "zCoordinate": {
+     "type": "number"
+    }
+   },
+   "required": [
+    "coordinates",
+    "zCoordinate"
+   ],
+   "type": "object"
+  },
+  "PolylineSettings": {
+   "additionalProperties": false,
+   "description": "Settings for modifying a Polyline. Setting coordinates replaces the entire polygon (single contour, no holes) and may change the number of vertices.",
+   "properties": {
+    "arcs": {
+     "items": {
+      "$ref": "#/PolyArc"
+     },
+     "type": "array"
+    },
+    "coordinates": {
+     "items": {
+      "$ref": "#/Coordinate2D"
+     },
+     "minItems": 2,
+     "type": "array"
+    },
+    "linePenIndex": {
+     "type": "integer"
+    },
+    "lineTypeId": {
+     "$ref": "#/AttributeId"
+    },
+    "roomSeparator": {
+     "type": "boolean"
+    }
+   },
+   "required": [],
+   "type": "object"
+  },
+  "RoofDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "angle": {
+     "description": "Single-plane: the slope in radians.",
+     "type": "number"
+    },
+    "buildingMaterialId": {
+     "$ref": "#/AttributeId"
+    },
+    "compositeId": {
+     "$ref": "#/AttributeId"
+    },
+    "eavesOverhang": {
+     "description": "Multi-plane: the eaves overhang beyond the pivot polygon.",
+     "type": "number"
+    },
+    "holes": {
+     "$ref": "#/Holes2D"
+    },
+    "level": {
+     "description": "Height of the pivot line (single-plane) or the pivot polygon (multi-plane) above the floor level.",
+     "type": "number"
+    },
+    "levels": {
+     "description": "Multi-plane: the roof levels, each with its height above the previous and its slope in radians.",
+     "items": {
+      "$ref": "#/RoofDetailsLevel"
+     },
+     "type": "array"
+    },
+    "pivotLine": {
+     "$ref": "#/RoofDetailsPivotLine",
+     "description": "For single-plane roofs."
+    },
+    "pivotPolygonOutline": {
+     "description": "Multi-plane: the pivot polygon the planes rise from. Arcs are not carried; a curved pivot edge comes back as its end points.",
+     "items": {
+      "$ref": "#/Coordinate2D"
+     },
+     "type": "array"
+    },
+    "polygonArcs": {
+     "items": {
+      "$ref": "#/PolyArc"
+     },
+     "type": "array"
+    },
+    "polygonOutline": {
+     "description": "The roof's polygon: the plane roof's outline, the multi-plane roof's contour.",
+     "items": {
+      "$ref": "#/Coordinate2D"
+     },
+     "type": "array"
+    },
+    "roofClass": {
+     "enum": [
+      "SinglePlane",
+      "MultiPlane"
+     ],
+     "type": "string"
+    },
+    "structureType": {
+     "$ref": "#/RoofStructureType"
+    },
+    "thickness": {
+     "type": "number"
+    },
+    "zCoordinate": {
+     "type": "number"
+    }
+   },
+   "required": [
+    "roofClass",
+    "structureType",
+    "thickness",
+    "level",
+    "zCoordinate",
+    "polygonOutline"
+   ],
+   "type": "object"
+  },
+  "RoofDetailsLevel": {
+   "additionalProperties": false,
+   "properties": {
+    "angle": {
+     "type": "number"
+    },
+    "height": {
+     "type": "number"
+    }
+   },
+   "required": [
+    "height",
+    "angle"
+   ],
+   "type": "object"
+  },
+  "RoofDetailsPivotLine": {
+   "additionalProperties": false,
+   "description": "The pivot line about which a roof plane rotates.",
+   "properties": {
+    "begin": {
+     "$ref": "#/Coordinate2D"
+    },
+    "end": {
+     "$ref": "#/Coordinate2D"
+    }
+   },
+   "required": [
+    "begin",
+    "end"
+   ],
+   "type": "object"
+  },
+  "RoofStructureType": {
+   "enum": [
+    "Basic",
+    "Composite"
+   ],
+   "type": "string"
+  },
+  "SlabDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "bottomMaterial": {
+     "$ref": "#/OverriddenMaterial"
+    },
+    "buildingMaterialId": {
+     "$ref": "#/AttributeId"
+    },
+    "compositeId": {
+     "$ref": "#/AttributeId"
+    },
+    "cutFillBackgroundPen": {
+     "$ref": "#/OverriddenPen"
+    },
+    "cutFillPen": {
+     "$ref": "#/OverriddenPen"
+    },
+    "floorFill": {
+     "$ref": "#/FloorFill"
+    },
+    "holes": {
+     "$ref": "#/Holes2D"
+    },
+    "level": {
+     "description": "Distance of the reference level of the slab from the floor level.",
+     "type": "number"
+    },
+    "offsetFromTop": {
+     "description": "Vertical distance between the reference level and the top of the slab.",
+     "type": "number"
+    },
+    "polygonArcs": {
+     "description": "Polygon outline arcs of the slab.",
+     "items": {
+      "$ref": "#/PolyArc"
+     },
+     "type": "array"
+    },
+    "polygonOutline": {
+     "description": "Polygon outline of the slab.",
+     "items": {
+      "$ref": "#/Coordinate2D"
+     },
+     "type": "array"
+    },
+    "referencePlaneLocation": {
+     "$ref": "#/SlabReferencePlaneLocation"
+    },
+    "sideMaterial": {
+     "$ref": "#/OverriddenMaterial"
+    },
+    "structureType": {
+     "$ref": "#/SlabStructureType"
+    },
+    "thickness": {
+     "description": "Thickness of the slab.",
+     "type": "number"
+    },
+    "topMaterial": {
+     "$ref": "#/OverriddenMaterial"
+    },
+    "zCoordinate": {
+     "type": "number"
+    }
+   },
+   "required": [
+    "thickness",
+    "level",
+    "offsetFromTop",
+    "zCoordinate",
+    "polygonOutline",
+    "holes"
+   ],
+   "type": "object"
+  },
+  "SlabReferencePlaneLocation": {
+   "description": "Location of the slab reference plane.",
+   "enum": [
+    "Top",
+    "CoreTop",
+    "CoreBottom",
+    "Bottom"
+   ],
+   "type": "string"
+  },
+  "SlabStructureType": {
+   "enum": [
+    "Basic",
+    "Composite"
+   ],
+   "type": "string"
+  },
+  "SplineSettings": {
+   "additionalProperties": false,
+   "description": "Settings for modifying a Spline. Only these settings fields are modifiable - Archicad's own API does not support changing Spline geometry (coordinates/closed) via ACAPI_Element_Change.",
+   "properties": {
+    "linePenIndex": {
+     "type": "integer"
+    },
+    "lineTypeId": {
+     "$ref": "#/AttributeId"
+    },
+    "roomSeparator": {
+     "type": "boolean"
+    }
+   },
+   "required": [],
+   "type": "object"
+  },
+  "StairDetails": {
+   "additionalProperties": false,
+   "description": "The settings of a Stair element, the ones CreateStairs takes. The finishes and the structure are modeled by the Stair's subelements (risers, treads and structures), which GetSubelementsOfHierarchicalElements lists.",
+   "properties": {
+    "baseLineArcs": {
+     "description": "The curved segments of the baseline, present only when it has any.",
+     "items": {
+      "$ref": "#/PolyArc"
+     },
+     "type": "array"
+    },
+    "baseLinePoints": {
+     "description": "The baseline polyline the stair is placed along, as given to CreateStairs.",
+     "items": {
+      "$ref": "#/Coordinate2D"
+     },
+     "type": "array"
+    },
+    "finishVisible": {
+     "description": "Whether the tread/riser finishes are modeled. If false only the stair structure (e.g. a monolith) is.",
+     "type": "boolean"
+    },
+    "flightWidth": {
+     "description": "Width of the stair flight.",
+     "type": "number"
+    },
+    "level": {
+     "description": "Height of the stair base above the home story level.",
+     "type": "number"
+    },
+    "riserHeight": {
+     "description": "Height of each riser.",
+     "type": "number"
+    },
+    "stepNum": {
+     "description": "Number of risers (steps).",
+     "type": "integer"
+    },
+    "totalHeight": {
+     "description": "Total height of the stair.",
+     "type": "number"
+    },
+    "treadDepth": {
+     "description": "Depth (going) of each tread.",
+     "type": "number"
+    },
+    "zCoordinate": {
+     "description": "Absolute elevation of the stair base.",
+     "type": "number"
+    }
+   },
+   "required": [
+    "stepNum",
+    "riserHeight",
+    "treadDepth",
+    "flightWidth",
+    "totalHeight",
+    "level",
+    "zCoordinate",
+    "finishVisible",
+    "baseLinePoints"
+   ],
+   "type": "object"
+  },
+  "StoriesParameters": {
+   "description": "A list of project stories, each with their complete parameters.",
+   "items": {
+    "$ref": "#/StoryParameters"
+   },
+   "type": "array"
+  },
+  "StoryParameters": {
+   "additionalProperties": false,
+   "description": "Represents all parameters of a single project story, including its unique identifiers. Used in API responses.",
+   "properties": {
+    "dispOnSections": {
+     "description": "Story level lines should appear on sections and elevations.",
+     "type": "boolean"
+    },
+    "floorId": {
+     "description": "Unique ID of the story.",
+     "type": "integer"
+    },
+    "height": {
+     "description": "Story height, calculated as the level of the story above minus this story's level. The topmost story gets its height from the virtual story that Archicad keeps above it in the story settings; only an Archicad that did not report that virtual story would leave the top story without a height.",
+     "type": "number"
+    },
+    "ifcId": {
+     "description": "The IFC GlobalId of the story, i.e. of the IfcBuildingStorey it is exported as (the same identifier the IFC Project Manager shows). Available from Archicad 28; older versions omit it.",
+     "type": "string"
+    },
+    "index": {
+     "description": "The story index.",
+     "type": "integer"
+    },
+    "level": {
+     "description": "The story level.",
+     "type": "number"
+    },
+    "name": {
+     "description": "The name of the story.",
+     "type": "string"
+    }
+   },
+   "required": [
+    "index",
+    "floorId",
+    "dispOnSections",
+    "level",
+    "name"
+   ],
+   "type": "object"
+  },
+  "StoryVisibility": {
+   "additionalProperties": false,
+   "description": "Per-story visibility settings (API_StoryVisibility): the home story, plus how many stories above/below also show this element.",
+   "properties": {
+    "showAllAbove": {
+     "description": "Show on all stories above the home story.",
+     "type": "boolean"
+    },
+    "showAllBelow": {
+     "description": "Show on all stories below the home story.",
+     "type": "boolean"
+    },
+    "showOnHome": {
+     "description": "Show on the home story.",
+     "type": "boolean"
+    },
+    "showRelAbove": {
+     "description": "Show this many stories above the home story (ignored when showAllAbove is true).",
+     "type": "integer"
+    },
+    "showRelBelow": {
+     "description": "Show this many stories below the home story (ignored when showAllBelow is true).",
+     "type": "integer"
+    }
+   },
+   "type": "object"
+  },
+  "SuccessfulExecutionResult": {
+   "additionalProperties": false,
+   "description": "The result of a successful execution.",
+   "properties": {
+    "success": {
+     "enum": [
+      true
+     ],
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "success"
+   ],
+   "type": "object"
+  },
+  "SurfaceType": {
+   "description": "The type of a surface material.",
+   "enum": [
+    "General",
+    "Simple",
+    "Matte",
+    "Metal",
+    "Plastic",
+    "Glass",
+    "Glowing",
+    "Constant"
+   ],
+   "type": "string"
+  },
+  "SymbolLabelTextDirection": {
+   "description": "Direction of the symbol label's text.",
+   "enum": [
+    "Parallel",
+    "Horizontal",
+    "Vertical",
+    "General"
+   ],
+   "type": "string"
+  },
+  "TextBoxAnchor": {
+   "description": "Anchor point of the text box.",
+   "enum": [
+    "LeftTop",
+    "MiddleTop",
+    "RightTop",
+    "LeftMiddle",
+    "MiddleMiddle",
+    "RightMiddle",
+    "LeftBottom",
+    "MiddleBottom",
+    "RightBottom"
+   ],
+   "type": "string"
+  },
+  "TextDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "angle": {
+     "description": "The rotation angle in radians (same as style.angle).",
+     "type": "number"
+    },
+    "height": {
+     "description": "The character height in millimeters (same as style.height).",
+     "type": "number"
+    },
+    "justification": {
+     "$ref": "#/Justification",
+     "description": "Same as style.justification."
+    },
+    "paragraphCount": {
+     "description": "Read-only: number of paragraphs in the memo (Tapir's own Create/Modify commands always produce 1).",
+     "type": "integer"
+    },
+    "pen": {
+     "description": "The pen attribute index (same as style.penIndex).",
+     "type": "integer"
+    },
+    "position": {
+     "$ref": "#/Coordinate2D",
+     "description": "The placement position of the text."
+    },
+    "runs": {
+     "description": "The styled runs of the content, present whenever the content has paragraphs (always for content Tapir created); one entry per run, a single run too, as a run may carry a pen, font, face or size of its own. Concatenating the runs' text in order gives the full content.",
+     "items": {
+      "$ref": "#/TextRunDetails"
+     },
+     "type": "array"
+    },
+    "style": {
+     "$ref": "#/TextStyleDetails",
+     "description": "The flat fields above are the subset SetDetailsOfElements takes back."
+    },
+    "text": {
+     "description": "The text content. Newlines separate the lines.",
+     "type": "string"
+    },
+    "zCoordinate": {
+     "description": "The level of the text's floor.",
+     "type": "number"
+    }
+   },
+   "required": [
+    "text",
+    "position",
+    "angle",
+    "height",
+    "pen",
+    "justification",
+    "zCoordinate",
+    "style",
+    "paragraphCount"
+   ],
+   "type": "object"
+  },
+  "TextRunDetails": {
+   "additionalProperties": false,
+   "description": "One monostyle run of text (API_RunType). Concatenating 'text' across all runs in order gives the full content; a newline character starts a new line.",
+   "properties": {
+    "bold": {
+     "type": "boolean"
+    },
+    "effectProtected": {
+     "description": "Optional; defaults to the style's effectProtected.",
+     "type": "boolean"
+    },
+    "effectStrikeout": {
+     "description": "Optional; defaults to the style's effectStrikeout.",
+     "type": "boolean"
+    },
+    "effectSubscript": {
+     "description": "Optional; defaults to the style's effectSubscript.",
+     "type": "boolean"
+    },
+    "effectSuperscript": {
+     "description": "Optional; defaults to the style's effectSuperscript.",
+     "type": "boolean"
+    },
+    "fontIndex": {
+     "description": "Font attribute index. Optional; defaults to the style's fontIndex.",
+     "type": "integer"
+    },
+    "fontName": {
+     "description": "Name of the font for this run only, resolved like the style's fontName (and taking precedence over the run's fontIndex). Optional; defaults to the style's font. Read back as the name of the font the run's fontIndex refers to, absent when no loaded font has that index.",
+     "type": "string"
+    },
+    "heightOverride": {
+     "description": "Character height in mm for this run only. Optional; defaults to the style's height.",
+     "type": "number"
+    },
+    "italic": {
+     "type": "boolean"
+    },
+    "penIndex": {
+     "description": "Pen attribute index. Optional; defaults to the style's penIndex.",
+     "type": "integer"
+    },
+    "text": {
+     "description": "The run's text content. Windows-style CRLF (and bare CR) line endings are normalized to LF.",
+     "type": "string"
+    },
+    "underline": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "text"
+   ],
+   "type": "object"
+  },
+  "TextSettings": {
+   "additionalProperties": false,
+   "description": "Settings for modifying a Text element or a text-type Label. For Labels only the text field is applied. Setting text replaces the whole content (any per-run formatting of the old content is dropped) and switches the element to automatic width, matching the behavior of CreateTexts/CreateLabels.",
+   "properties": {
+    "angle": {
+     "description": "The rotation angle in radians. Only applied to Text elements.",
+     "type": "number"
+    },
+    "height": {
+     "description": "The character height in millimeters. Only applied to Text elements. A multistyle Text takes its height from the per-run sizes of its content, so applying it rebuilds the content as one paragraph with the new height on every run (the runs' own pens/fonts/faces are kept) and switches the element to automatic width, as setting text does. Refused when the content holds an autotext run; give the new content explicitly via text then, or use ModifyTexts.",
+     "type": "number"
+    },
+    "justification": {
+     "$ref": "#/Justification",
+     "description": "Only applied to Text elements."
+    },
+    "position": {
+     "$ref": "#/Coordinate2D",
+     "description": "The placement position of the text. Only applied to Text elements."
+    },
+    "text": {
+     "description": "The new text content. Newlines create multiple lines; Windows-style CRLF (and bare CR) line endings are normalized to LF.",
+     "type": "string"
+    }
+   },
+   "required": [],
+   "type": "object"
+  },
+  "TextStyleDetails": {
+   "additionalProperties": false,
+   "description": "Full readable style state of a Text or text-class Label: every field of TextStyleSettableDetails plus the read-only ones (lineCount, boxWidth, boxHeight).",
+   "properties": {
+    "anchor": {
+     "$ref": "#/TextBoxAnchor"
+    },
+    "angle": {
+     "description": "Rotation angle in radians.",
+     "type": "number"
+    },
+    "bold": {
+     "type": "boolean"
+    },
+    "boxHeight": {
+     "description": "Read-only: vertical size of the text box in mm, auto-computed by Archicad.",
+     "type": "number"
+    },
+    "boxWidth": {
+     "description": "Read-only: horizontal size of the text box in mm, auto-computed by Archicad.",
+     "type": "number"
+    },
+    "charSpaceFactor": {
+     "description": "Character spacing scale, between 0.75 and 10.0.",
+     "type": "number"
+    },
+    "contourOffset": {
+     "description": "Offset of the frame/background fill from the text bounding box, in mm.",
+     "type": "number"
+    },
+    "contourPenIndex": {
+     "description": "Pen index of the text block's frame.",
+     "type": "integer"
+    },
+    "effectProtected": {
+     "description": "Protected text (autotext reference).",
+     "type": "boolean"
+    },
+    "effectStrikeout": {
+     "type": "boolean"
+    },
+    "effectSubscript": {
+     "type": "boolean"
+    },
+    "effectSuperscript": {
+     "type": "boolean"
+    },
+    "fillPenIndex": {
+     "description": "Pen index of the text block's background fill.",
+     "type": "integer"
+    },
+    "fixedAngle": {
+     "description": "The rotation angle does not change when the element is rotated.",
+     "type": "boolean"
+    },
+    "fixedSize": {
+     "description": "Size does not depend on output scale.",
+     "type": "boolean"
+    },
+    "flipEnabled": {
+     "description": "The text should always be readable (flips when viewed upside down).",
+     "type": "boolean"
+    },
+    "fontIndex": {
+     "description": "Font attribute index.",
+     "type": "integer"
+    },
+    "fontName": {
+     "description": "The name of the font fontIndex refers to, as the Font attributes carry it. Absent when no loaded font has that index.",
+     "type": "string"
+    },
+    "height": {
+     "description": "Character height in mm.",
+     "type": "number"
+    },
+    "italic": {
+     "type": "boolean"
+    },
+    "justification": {
+     "$ref": "#/Justification"
+    },
+    "lineCount": {
+     "description": "Read-only: number of text lines (API_TextType::nLine).",
+     "type": "integer"
+    },
+    "penIndex": {
+     "description": "Pen attribute index.",
+     "type": "integer"
+    },
+    "spacing": {
+     "description": "Line spacing factor, between -10.0 and -1.0.",
+     "type": "number"
+    },
+    "textFrameFixedHeight": {
+     "description": "Frame height in mm, when textFrameSizeFixed is true (ignored for Circle, which uses fixedWidth as diameter). Between 1 and 1000. Available from Archicad 28; earlier versions ignore it and read it back as 0.",
+     "type": "number"
+    },
+    "textFrameFixedWidth": {
+     "description": "Frame width in mm, when textFrameSizeFixed is true. Between 1 and 1000. Available from Archicad 28; earlier versions ignore it and read it back as 0.",
+     "type": "number"
+    },
+    "textFrameShape": {
+     "description": "Text frame shape. Standalone Text elements only support Rectangle. Available from Archicad 28; earlier versions ignore it and read it back as Rectangle.",
+     "enum": [
+      "Rectangle",
+      "Circle",
+      "RoundedRectangle",
+      "Pill"
+     ],
+     "type": "string"
+    },
+    "textFrameSizeFixed": {
+     "description": "Use fixedWidth/fixedHeight instead of fitting the frame to the text box. Available from Archicad 28; earlier versions ignore it and read it back as false.",
+     "type": "boolean"
+    },
+    "underline": {
+     "type": "boolean"
+    },
+    "usedContour": {
+     "description": "Draw the frame of the text block.",
+     "type": "boolean"
+    },
+    "usedFill": {
+     "description": "Draw a solid fill behind the text block.",
+     "type": "boolean"
+    },
+    "widthFactor": {
+     "description": "Width scale of the text, between 0.75 and 10.0.",
+     "type": "number"
+    }
+   },
+   "type": "object"
+  },
+  "Texture": {
+   "additionalProperties": false,
+   "description": "Texture parameters",
+   "properties": {
+    "FillRectangle": {
+     "description": "True, if fit the rectangle with the picture in a central position, using the natural aspect ratio of the picture.",
+     "type": "boolean"
+    },
+    "FitPicture": {
+     "description": "True, if fit the picture in the middle of the rectangle, using the natural aspect ratio of the picture.",
+     "type": "boolean"
+    },
+    "alphaChannelChangesAmbientColor": {
+     "description": "True, if the alpha channel of the texture changes the ambient color.",
+     "type": "boolean"
+    },
+    "alphaChannelChangesDiffuseColor": {
+     "description": "True, if the alpha channel of the texture changes the diffuse color.",
+     "type": "boolean"
+    },
+    "alphaChannelChangesSpecularColor": {
+     "description": "True, if the alpha channel of the texture changes the specular color.",
+     "type": "boolean"
+    },
+    "alphaChannelChangesSurfaceColor": {
+     "description": "True, if the alpha channel of the texture changes the surface color.",
+     "type": "boolean"
+    },
+    "alphaChannelChangesTransparency": {
+     "description": "True, if the alpha channel of the texture changes the transparency.",
+     "type": "boolean"
+    },
+    "mirrorX": {
+     "description": "True, if the texture is mirrored in X direction.",
+     "type": "boolean"
+    },
+    "mirrorY": {
+     "description": "True, if the texture is mirrored in Y direction.",
+     "type": "boolean"
+    },
+    "name": {
+     "description": "The filename of the texture in the library (without extension).",
+     "type": "string"
+    },
+    "rotationAngle": {
+     "description": "Rotation angle in radians.",
+     "type": "number"
+    },
+    "useAlphaChannel": {
+     "description": "True, if the alpha channel of the texture is used.",
+     "type": "boolean"
+    },
+    "xSize": {
+     "description": "X size of the picture in model space, by default 1.",
+     "type": "number"
+    },
+    "ySize": {
+     "description": "Y size of the picture in model space, by default 1.",
+     "type": "number"
+    }
+   },
+   "required": [
+    "name"
+   ],
+   "type": "object"
+  },
+  "TextureProjectionType": {
+   "description": "Projection type of the 3D texture.",
+   "enum": [
+    "Invalid",
+    "Planar",
+    "Default",
+    "Cylindric",
+    "Spheric",
+    "Box"
+   ],
+   "type": "string"
+  },
+  "TypeSpecificDetails": {
+   "description": "Represents the complete type-specific details of an element. Used as output from GET requests",
+   "oneOf": [
+    {
+     "$ref": "#/HotlinkDetails"
+    },
+    {
+     "$ref": "#/WallDetails"
+    },
+    {
+     "$ref": "#/BeamDetails"
+    },
+    {
+     "$ref": "#/SlabDetails"
+    },
+    {
+     "$ref": "#/RoofDetails"
+    },
+    {
+     "$ref": "#/ColumnDetails"
+    },
+    {
+     "$ref": "#/ColumnSegmentDetails"
+    },
+    {
+     "$ref": "#/BeamSegmentDetails"
+    },
+    {
+     "$ref": "#/DetailWorksheetDetails"
+    },
+    {
+     "$ref": "#/WindowDoorDetails"
+    },
+    {
+     "$ref": "#/LibPartBasedElementDetails"
+    },
+    {
+     "$ref": "#/ObjectDetails"
+    },
+    {
+     "$ref": "#/PolylineDetails"
+    },
+    {
+     "$ref": "#/ZoneDetails"
+    },
+    {
+     "$ref": "#/CurtainWallDetails"
+    },
+    {
+     "$ref": "#/CurtainWallSegmentDetails"
+    },
+    {
+     "$ref": "#/CurtainWallPanelDetails"
+    },
+    {
+     "$ref": "#/CurtainWallFrameDetails"
+    },
+    {
+     "$ref": "#/MeshDetails"
+    },
+    {
+     "$ref": "#/MorphDetails"
+    },
+    {
+     "$ref": "#/DrawingDetails"
+    },
+    {
+     "$ref": "#/LabelDetails"
+    },
+    {
+     "$ref": "#/TextDetails"
+    },
+    {
+     "$ref": "#/LevelDimensionDetails"
+    },
+    {
+     "$ref": "#/StairDetails"
+    },
+    {
+     "$ref": "#/NotYetSupportedElementTypeDetails"
+    }
+   ],
+   "type": "object"
+  },
+  "TypeSpecificSettings": {
+   "description": "Defines the modifiable type-specific settings for an element. Used as input for SET requests.",
+   "oneOf": [
+    {
+     "$ref": "#/WallSettings"
+    },
+    {
+     "$ref": "#/ZoneSettings"
+    },
+    {
+     "$ref": "#/LineSettings"
+    },
+    {
+     "$ref": "#/ArcSettings"
+    },
+    {
+     "$ref": "#/HotspotSettings"
+    },
+    {
+     "$ref": "#/SplineSettings"
+    },
+    {
+     "$ref": "#/PolylineSettings"
+    },
+    {
+     "$ref": "#/HatchSettings"
+    },
+    {
+     "$ref": "#/DrawingSettings"
+    },
+    {
+     "$ref": "#/TextSettings"
+    }
+   ],
+   "type": "object"
+  },
+  "ViewDepthLimitation": {
+   "description": "Floor plan view depth limitation.",
+   "enum": [
+    "ToFloorPlanRange",
+    "ToAbsoluteLimit",
+    "EntireElement"
+   ],
+   "type": "string"
+  },
+  "WallDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "aboveViewLinePen": {
+     "description": "Pen used when \"Overhead All\" is selected from the \"Floor Plan Display\" popup. Corresponds to the \"Overhead Line Pens\" value in the Wall Settings dialog.",
+     "minimum": 1,
+     "type": "integer"
+    },
+    "aboveViewLineTypeId": {
+     "$ref": "#/AttributeId",
+     "description": "Line type used when \"Overhead All\" is selected from the \"Floor Plan Display\" popup - pairs with aboveViewLinePen."
+    },
+    "alignTexture": {
+     "description": "Align texture mapping to the wall's edges.",
+     "type": "boolean"
+    },
+    "arcAngle": {
+     "description": "The arc angle of the curved wall in radians.",
+     "type": "number"
+    },
+    "begCoordinate": {
+     "$ref": "#/Coordinate2D"
+    },
+    "begThickness": {
+     "description": "Thickness at the beginning of wall, it will return 0 for poly wall type",
+     "type": "number"
+    },
+    "belowViewLineTypeId": {
+     "$ref": "#/AttributeId",
+     "description": "Line type used when \"OutLines Only\" is selected from the \"Floor Plan Display\" popup (API_WallType::belowViewLineType). Corresponds to the \"Uncut Lines\" value in the Wall Settings dialog."
+    },
+    "bottomOffset": {
+     "description": "base level of the wall relative to the floor level",
+     "type": "number"
+    },
+    "buildingMaterialId": {
+     "$ref": "#/AttributeId"
+    },
+    "compositeId": {
+     "$ref": "#/AttributeId"
+    },
+    "connectionPriority": {
+     "description": "Priority of the wall in a junction with other elements (API_WallType::wallConnPriority - higher wins the cut/cover at the junction). Archicad ignores writes to this field; read-only in practice.",
+     "type": "integer"
+    },
+    "contourLineTypeId": {
+     "$ref": "#/AttributeId",
+     "description": "Line type of the wall's own contour (API_WallType::contLtype) - pairs with contourPen, which only sets the pen, not the line type."
+    },
+    "contourPen": {
+     "description": "Pen of the wall's own contour/reference outline (API_WallType::contPen) - distinct from cutFillPen, which is the cut fill pattern's pen inherited from the building material/composite/profile. Unlike cutFillPen this is not inheritable/overridable, it is the wall's own pen index directly, the same field used regardless of structureType (Basic, Composite or Profile).",
+     "minimum": 1,
+     "type": "integer"
+    },
+    "contourPen3D": {
+     "description": "Pen of the wall's contour in 3D views (API_WallType::contPen3D).",
+     "minimum": 1,
+     "type": "integer"
+    },
+    "cutFillBackgroundPen": {
+     "$ref": "#/OverriddenPen"
+    },
+    "cutFillPen": {
+     "$ref": "#/OverriddenPen"
+    },
+    "displayOption": {
+     "$ref": "#/DisplayOption"
+    },
+    "endCoordinate": {
+     "$ref": "#/Coordinate2D"
+    },
+    "endThickness": {
+     "description": "Thickness at the end of wall, it will return 0 for poly wall type",
+     "type": "number"
+    },
+    "flipped": {
+     "type": "boolean"
+    },
+    "geometryType": {
+     "$ref": "#/WallGeometryType"
+    },
+    "hasDoor": {
+     "description": "Whether the wall has at least one Door. Output only.",
+     "type": "boolean"
+    },
+    "hasWindow": {
+     "description": "Whether the wall has at least one Window. Output only.",
+     "type": "boolean"
+    },
+    "height": {
+     "description": "height relative to bottom",
+     "type": "number"
+    },
+    "inheritEndSurface": {
+     "description": "The end surface of the wall is inherited from the adjoining wall.",
+     "type": "boolean"
+    },
+    "isAutoOnStoryVisibility": {
+     "description": "When true (the default on a new wall), Archicad recomputes 'visibility' automatically from the wall's vertical extent and ignores any value set for it.",
+     "type": "boolean"
+    },
+    "junctionSequence": {
+     "description": "Tie-breaker (0-999) used when two walls meet with the same connectionPriority, or when 3+ walls meet in a junction (API_WallType::sequence). Archicad ignores writes to this field; read-only in practice.",
+     "type": "integer"
+    },
+    "linkToSettings": {
+     "$ref": "#/LinkToSettings",
+     "description": "newCreationMode is expected to read back as false after creation; Archicad resolves the relative story selection to an absolute floor index."
+    },
+    "logHeight": {
+     "description": "Height of the log for log walls. 0 means a normal (non-log) wall.",
+     "type": "number"
+    },
+    "materialsChained": {
+     "description": "Whether the surface materials are chained.",
+     "type": "boolean"
+    },
+    "offset": {
+     "description": "wall's base line's offset from ref. line",
+     "type": "number"
+    },
+    "offsetFromOutside": {
+     "description": "Distance between the reference line and the outside face of the wall. Output only - not settable via ModifyWalls.",
+     "type": "number"
+    },
+    "oppositeMaterial": {
+     "$ref": "#/OverriddenMaterial"
+    },
+    "polyCanChange": {
+     "description": "The polygonal wall's corners can be changed in case of L and T connections. Only meaningful for a Polygonal wall (geometryType).",
+     "type": "boolean"
+    },
+    "polygonArcs": {
+     "description": "Polygon arcs in case of polygonal wall",
+     "items": {
+      "$ref": "#/PolyArc"
+     },
+     "type": "array"
+    },
+    "polygonOutline": {
+     "description": "Polygon outline in case of polygonal wall",
+     "items": {
+      "$ref": "#/Coordinate2D"
+     },
+     "type": "array"
+    },
+    "profileId": {
+     "$ref": "#/AttributeId"
+    },
+    "profileType": {
+     "$ref": "#/WallProfileType",
+     "description": "Only Normal/Slanted/Trapez are settable via ModifyWalls - Poly needs a profile attribute wired through a separate mechanism. slantAlpha/slantBeta only have an effect once this is Slanted or Trapez."
+    },
+    "referenceLineLocation": {
+     "$ref": "#/WallReferenceLineLocation"
+    },
+    "referenceMaterial": {
+     "$ref": "#/OverriddenMaterial"
+    },
+    "relativeTopStory": {
+     "description": "Non-zero links the wall's top to another story instead of an explicit height - do not set together with 'height' via ModifyWalls in the same call.",
+     "type": "number"
+    },
+    "sideMaterial": {
+     "$ref": "#/OverriddenMaterial"
+    },
+    "slantAlpha": {
+     "description": "Only has an effect once profileType is set to Slanted or Trapez.",
+     "type": "number"
+    },
+    "slantBeta": {
+     "description": "Only has an effect once profileType is set to Slanted or Trapez.",
+     "type": "number"
+    },
+    "structureType": {
+     "$ref": "#/WallStructureType"
+    },
+    "topOffset": {
+     "description": "Only has an effect when relativeTopStory is non-zero.",
+     "type": "number"
+    },
+    "useCompositePriority": {
+     "description": "When true, the Composite's own priority is used at junctions instead of connectionPriority.",
+     "type": "boolean"
+    },
+    "viewDepthLimitation": {
+     "$ref": "#/ViewDepthLimitation",
+     "description": "Only has an effect on a multi-story wall (relativeTopStory/topOffset making it span more than one story)."
+    },
+    "visibility": {
+     "$ref": "#/StoryVisibility",
+     "description": "On Archicad 29 a wall knows only 'Home story only' and 'All relevant stories' (Wall Settings offers no Custom option), so a wall can read back a combination the dialog cannot show - a wall fresh from the Wall tool defaults may report showOnHome false with showRelAbove 1, which Wall Settings shows as an empty Show on Stories field (#852). See ModifyWalls for which combinations can be written."
+    },
+    "zCoordinate": {
+     "type": "number"
+    },
+    "zoneRel": {
+     "$ref": "#/WallZoneRelation"
+    }
+   },
+   "required": [
+    "geometryType",
+    "begCoordinate",
+    "endCoordinate",
+    "zCoordinate",
+    "height",
+    "bottomOffset",
+    "offset"
+   ],
+   "type": "object"
+  },
+  "WallGeometryType": {
+   "enum": [
+    "Straight",
+    "Trapezoid",
+    "Polygonal"
+   ],
+   "type": "string"
+  },
+  "WallProfileType": {
+   "description": "Cross section shape of the wall, distinct from geometryType (which is the plan outline).",
+   "enum": [
+    "Normal",
+    "Slanted",
+    "Trapez",
+    "Poly"
+   ],
+   "type": "string"
+  },
+  "WallReferenceLineLocation": {
+   "description": "The Core* values only have an effect on a Composite or Profile wall (structureType) - a Basic wall has no core skin, and Archicad falls back to the nearest non-core equivalent (e.g. CoreCenter becomes Center).",
+   "enum": [
+    "Outside",
+    "Center",
+    "Inside",
+    "CoreOutside",
+    "CoreCenter",
+    "CoreInside"
+   ],
+   "type": "string"
+  },
+  "WallSettings": {
+   "additionalProperties": false,
+   "description": "Settings for modifying a wall.",
+   "properties": {
+    "begCoordinate": {
+     "$ref": "#/Coordinate2D"
+    },
+    "begThickness": {
+     "description": "Thickness at the beginning in case of trapezoid wall",
+     "type": "number"
+    },
+    "bottomOffset": {
+     "description": "base level of the wall relative to the floor level",
+     "type": "number"
+    },
+    "endCoordinate": {
+     "$ref": "#/Coordinate2D"
+    },
+    "endThickness": {
+     "description": "Thickness at the end in case of trapezoid wall",
+     "type": "number"
+    },
+    "height": {
+     "description": "height relative to bottom",
+     "type": "number"
+    },
+    "offset": {
+     "description": "wall's base line's offset from ref. line",
+     "type": "number"
+    }
+   },
+   "required": [],
+   "type": "object"
+  },
+  "WallStructureType": {
+   "enum": [
+    "Basic",
+    "Composite",
+    "Profile"
+   ],
+   "type": "string"
+  },
+  "WallZoneRelation": {
+   "enum": [
+    "Boundary",
+    "ReduceArea",
+    "None",
+    "SubtractFromZone"
+   ],
+   "type": "string"
+  },
+  "WindowDoorDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "centerOffset": {
+     "description": "Center offset along the owner wall reference line.",
+     "type": "number"
+    },
+    "height": {
+     "description": "Opening height.",
+     "type": "number"
+    },
+    "libPart": {
+     "$ref": "#/LibPartDetails"
+    },
+    "oSide": {
+     "type": "boolean"
+    },
+    "ownerElementId": {
+     "$ref": "#/ElementId"
+    },
+    "ownerElementType": {
+     "$ref": "#/ElementType"
+    },
+    "refSide": {
+     "type": "boolean"
+    },
+    "reflected": {
+     "type": "boolean"
+    },
+    "reveal": {
+     "description": "Whether the reveal is turned on. The same value ModifyWindows and ModifyDoors take.",
+     "type": "boolean"
+    },
+    "revealDepthOffset": {
+     "description": "Distance the frame plane is moved across the wall thickness, along the wall normal. The same value ModifyWindows and ModifyDoors take.",
+     "type": "number"
+    },
+    "sillHeight": {
+     "description": "Sill height (window) or threshold height (door).",
+     "type": "number"
+    },
+    "width": {
+     "description": "Opening width.",
+     "type": "number"
+    }
+   },
+   "required": [
+    "libPart",
+    "width",
+    "height",
+    "sillHeight",
+    "centerOffset",
+    "reflected",
+    "refSide",
+    "oSide",
+    "reveal",
+    "revealDepthOffset"
+   ],
+   "type": "object"
+  },
+  "ZoneCreationGeometry": {
+   "description": "Defines the geometry of a zone. Used as input for creating zones.",
+   "oneOf": [
+    {
+     "$ref": "#/AutomaticZoneGeometry"
+    },
+    {
+     "$ref": "#/ManualZoneGeometry"
+    }
+   ],
+   "type": "object"
+  },
+  "ZoneDetails": {
+   "additionalProperties": false,
+   "properties": {
+    "categoryAttributeId": {
+     "$ref": "#/AttributeId",
+     "description": "The identifier of the zone category attribute."
+    },
+    "fixedStampAngle": {
+     "description": "If true, the zone stamp angle remains fixed when the element is rotated.",
+     "type": "boolean"
+    },
+    "holes": {
+     "$ref": "#/Holes2D"
+    },
+    "isManual": {
+     "description": "Is the coordinates of the zone manually placed?",
+     "type": "boolean"
+    },
+    "name": {
+     "description": "Name of the zone.",
+     "type": "string"
+    },
+    "numberStr": {
+     "description": "Zone number.",
+     "type": "string"
+    },
+    "polygonArcs": {
+     "description": "Polygon outline arcs of the zone.",
+     "items": {
+      "$ref": "#/PolyArc"
+     },
+     "type": "array"
+    },
+    "polygonOutline": {
+     "description": "The 2D coordinates of the edge of the zone.",
+     "items": {
+      "$ref": "#/Coordinate2D"
+     },
+     "minItems": 3,
+     "type": "array"
+    },
+    "referencePosition": {
+     "$ref": "#/Coordinate2D",
+     "description": "The reference point an automatic zone was placed from (the referencePosition of CreateZones); the zone is found around it when zones are updated. Only present when isManual is false."
+    },
+    "stampAngle": {
+     "description": "Rotation angle of the zone stamp in radians.",
+     "type": "number"
+    },
+    "stampPosition": {
+     "$ref": "#/Coordinate2D",
+     "description": "Position of the origin of the zone stamp."
+    },
+    "zCoordinate": {
+     "type": "number"
+    }
+   },
+   "required": [
+    "name",
+    "numberStr",
+    "categoryAttributeId",
+    "stampPosition",
+    "isManual",
+    "polygonOutline",
+    "zCoordinate"
+   ],
+   "type": "object"
+  },
+  "ZoneSettings": {
+   "additionalProperties": false,
+   "description": "Settings for modifying a zone.",
+   "properties": {
+    "fixedStampAngle": {
+     "description": "If true, the zone stamp angle remains fixed when the element is rotated.",
+     "type": "boolean"
+    },
+    "referencePosition": {
+     "$ref": "#/Coordinate2D",
+     "description": "Moves the reference point of an automatic zone; the zone is found around the new point when zones are next updated. Ignored for a manual zone (isManual true)."
+    },
+    "stampAngle": {
+     "description": "Rotation angle of the zone stamp in radians.",
+     "type": "number"
+    },
+    "stampPosition": {
+     "$ref": "#/Coordinate2D",
+     "description": "Position of the origin of the zone stamp."
+    }
+   },
+   "required": [],
+   "type": "object"
+  }
+ },
+ "tapirVersion": "1.7.3"
+}

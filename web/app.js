@@ -2,6 +2,7 @@
 import { generate, STRATEGIES, TIERS, WALLS, WALL_CORNERS, DESK_LAYOUTS, TABLE_SHAPES, offsetFromRef } from './generator.js';
 import { PRESETS, DEFAULT_PRESET, presetState } from './presets.js';
 import { drawPlan } from './plan.js';
+import { buildFile, slug } from './buildfile.js';
 
 const STORE_KEY = 'office-configurator/state/v1';
 const UI_KEY = 'office-configurator/ui/v1';
@@ -23,7 +24,22 @@ function decode(str) {
 function valid(s) {
   return s && typeof s === 'object' && s.site && Array.isArray(s.site.openings) && s.programme;
 }
+// The Build in Archicad window opens the app with #zone=<...> to hand over the selected Zone as a fixed site.
+function fromZone(z) {
+  const base = (() => { try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); if (valid(s)) return s; } catch { /* none */ } return presetState(DEFAULT_PRESET); })();
+  const mm = (v) => Math.round(Number(v) * 1000);
+  return {
+    ...base, siteFixed: true, name: z.name || base.name,
+    site: { ...base.site, width: mm(z.width), depth: mm(z.depth), height: z.height ? mm(z.height) : base.site.height, openings: [] },
+    placement: { fromZone: true, zoneName: z.name || '', origin: (z.origin || [0, 0, 0]).map(Number), rotationDeg: Number(z.rotationDeg) || 0, story: Number(z.story) || 0 },
+  };
+}
+
 function loadState() {
+  const zm = location.hash.match(/[#&]zone=([^&]+)/);
+  if (zm) {
+    try { return fromZone(decode(zm[1])); } catch { /* fall through */ }
+  }
   const m = location.hash.match(/[#&]s=([^&]+)/);
   if (m) {
     try { const s = decode(m[1]); if (valid(s)) return s; } catch { /* fall through */ }
@@ -69,8 +85,11 @@ function openingCard(o, i, locked) {
     </div></div>`;
 }
 
+const designName = () => state.name || (PRESETS[state.preset] ? PRESETS[state.preset].label : 'Office');
+
 function renderSide() {
   const s = state, locked = !!s.siteFixed, r = layout.readouts;
+  const pl = s.placement && s.placement.fromZone ? s.placement : null;
   const short = (a, b) => (a < b ? ' class="short"' : '');
   const rank = { error: 0, warn: 1, info: 2, ok: 3 };
   const checks = [...layout.checks].sort((a, b) => rank[a.level] - rank[b.level]);
@@ -82,6 +101,7 @@ function renderSide() {
       ${sel('preset', 'Preset', s.preset, Object.entries(PRESETS).map(([k, p]) => [k, p.label]))}
       ${sel('tier', 'Tier', s.tier, Object.entries(TIERS).map(([k, t]) => [k, t.label, !t.available]))}
     </div>
+    <label class="f" style="margin-top:6px">Design name<input type="text" data-path="name" data-testid="name" value="${esc(designName())}"></label>
     ${note ? `<p class="note" data-testid="note">${esc(note)}</p>` : ''}
   </section>
   <section class="group">
@@ -93,6 +113,7 @@ function renderSide() {
       ${num('site.height', 'Room height', s.site.height, { disabled: locked })}
       ${num('site.wall', 'Wall thickness', s.site.wall, { disabled: locked })}
     </div>
+    ${pl ? `<p class="note" data-testid="zone-note">From Archicad Zone "${esc(pl.zoneName)}" (story ${pl.story}, origin ${pl.origin.map((v) => v.toFixed(3)).join(' / ')} m, ${pl.rotationDeg}°). Its walls stay as they are in Archicad; add its doors so the checks can find a way in.</p>` : ''}
     <p class="note">${locked ? 'Nothing below changes the room or its openings while the site is fixed.' : 'Fix the site once the room matches the drawing; presets and strategies then only change the furniture.'}</p>
   </section>
   <section class="group">
@@ -171,7 +192,7 @@ function applyField(path, raw) {
     }
     return true;
   }
-  if (path === 'strategy' || path === 'tier') { state[path] = raw; return false; }
+  if (path === 'strategy' || path === 'tier' || path === 'name') { state[path] = raw; return false; }
   if (parts[0] === 'site') { state.site[parts[1]] = Number(raw); return false; }
   if (parts[0] === 'programme') {
     state.programme[parts[1]] = ['deskLayout', 'tableShape'].includes(parts[1]) ? raw : Number(raw);
@@ -199,9 +220,22 @@ document.addEventListener('change', (ev) => {
   update({ keepNote });
 });
 
+function downloadBuildFile() {
+  const name = designName();
+  const data = buildFile(state, layout, { name });
+  const blob = new Blob([JSON.stringify(data, null, 1)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${slug(name)}.office-build.json`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+
 document.addEventListener('click', (ev) => {
   const b = ev.target.closest('button');
   if (!b) return;
+  if (b.id === 'download') { downloadBuildFile(); return; }
   if (b.dataset.view) { ui.view = b.dataset.view; renderViews(); save(); return; }
   const a = b.dataset.action;
   if (!a) return;
@@ -217,6 +251,14 @@ document.addEventListener('click', (ev) => {
 });
 
 // ---------- boot ----------
+
+// A Zone handed over while the app is already open arrives as a hash change, not a page load.
+window.addEventListener('hashchange', () => {
+  if (/[#&]zone=/.test(location.hash)) {
+    state = loadState();
+    update();
+  }
+});
 
 update();
 import('./view3d.js').then(({ View3D }) => {
