@@ -1,8 +1,8 @@
 OFFICE CONFIGURATOR
 ===================
 
-Lay out a single office room (desks along the walls, a meeting table, phone
-booths) in your browser, with a 3D view, a dimensioned plan and checks.
+Lay out a single office room (desks along the walls or in back-to-back
+benches, a meeting table, phone booths) in your browser, with a 3D view, a dimensioned plan and checks.
 
 1. INSTALL
    You need Python 3.8 or newer. Nothing else.
@@ -23,6 +23,8 @@ booths) in your browser, with a 3D view, a dimensioned plan and checks.
    - Pick a preset, then type the room size and openings in exact mm.
      Each opening is measured from a corner you choose; switching the corner
      converts the number and leaves the opening where it is.
+   - Under Programme, choose how desks are arranged (along the walls,
+     back-to-back benches, or walls first) and a rectangular or round table.
    - Press "Fix site" once the room matches your drawing. After that, presets
      and strategies only change the furniture, never the room or its openings.
    - The Checks list says what did not fit and by how much. Nothing is dropped

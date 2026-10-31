@@ -6,12 +6,16 @@
 // In a wall frame, "s" is the distance along the wall from its start corner and
 // "n" the distance into the room from the wall face (negative n is inside the wall / outside).
 
+// Clearances follow the Dimensions.com "Private Office Clearances" sheet where it gives one:
+// desk back clearance 1070–1520 mm, table zone 560–760 mm (table edge to outside of the chairs).
 export const STANDARDS = Object.freeze({
   deskW: 1600, deskD: 800, deskH: 740,
-  chairZone: 1000,           // free depth behind a desk for the chair
+  chairZone: 1100,           // desk back clearance: free depth behind a desk for the chair (sheet: 1070–1520)
   chairW: 500, chairD: 500, chairH: 900,
+  benchMaxPerSide: 3,        // desks along one side of a back-to-back bench
   boothW: 1100, boothD: 1100, boothH: 2200, boothFront: 900,
-  tableH: 740, seatPitch: 700, tableRing: 800,
+  tableH: 740, seatPitch: 700, tableRing: 760, // table zone (sheet: 560–760)
+  roundSeatsMax: 8,
   passage: 900,              // clear width of the route from a door to every workpoint
   thresholdDepth: 1500, thresholdSide: 300,
   windowBandDepth: 1000,     // anything taller than the sill may not stand this close to a window
@@ -33,6 +37,14 @@ export const TIERS = Object.freeze({
   M: { label: 'M: floor with columns and a core (phase 3)', available: false },
   L: { label: 'L: multi-core floor (phase 4)', available: false },
 });
+
+export const DESK_LAYOUTS = Object.freeze({
+  walls: 'Along the walls',
+  benches: 'Back-to-back benches',
+  mixed: 'Walls, then benches',
+});
+
+export const TABLE_SHAPES = Object.freeze({ rect: 'Rectangular', round: 'Round (up to 8)' });
 
 export const WALLS = ['S', 'E', 'N', 'W'];
 export const WALL_CORNERS = Object.freeze({ S: ['SW', 'SE'], E: ['SE', 'NE'], N: ['NE', 'NW'], W: ['NW', 'SW'] });
@@ -251,6 +263,11 @@ export function tableSize(seats) {
   return { length: Math.max(800, perSide * S.seatPitch), depth: seats <= 2 ? 800 : 1000, perSide };
 }
 
+// Round table diameters: 4 seats 1070 mm (42"), 6 seats 1220 mm (48"), 8 seats 1520 mm (60").
+export function roundDiameter(seats) {
+  return seats <= 4 ? 1070 : seats <= 6 ? 1220 : 1520;
+}
+
 function windowLength(site, wall) {
   return site.openings.filter((o) => o.wall === wall && o.kind === 'window').reduce((t, o) => t + o.s1 - o.s0, 0);
 }
@@ -269,8 +286,17 @@ function deskWallOrder(site, strategy) {
   return info.map((x) => x.w);
 }
 
-// Greedy sweep along the walls. With `fast` (look-ahead only) the reachability test is skipped.
+// Desks along the walls, free-standing benches, or walls first and benches for the rest.
+// With `fast` (look-ahead only) the reachability test is skipped and benches use a coarse grid.
 function placeDesks(ctx, count, strategy, fast = false) {
+  let placed = 0;
+  if (ctx.deskLayout !== 'benches') placed += placeWallDesks(ctx, count, strategy, fast);
+  if (ctx.deskLayout !== 'walls') placed += placeBenches(ctx, count - placed, strategy, fast);
+  return placed;
+}
+
+// Greedy sweep along the walls.
+function placeWallDesks(ctx, count, strategy, fast) {
   const S = STANDARDS, site = ctx.site;
   let placed = 0;
   for (const wall of deskWallOrder(site, strategy)) {
@@ -293,10 +319,90 @@ function placeDesks(ctx, count, strategy, fast = false) {
   return placed;
 }
 
+// Unit vector from a desk towards its chair, for a desk turned by `rot` (0: back to the south).
+function chairDir(rot) {
+  return { 0: [0, 1], 90: [-1, 0], 180: [0, -1], 270: [1, 0] }[rot];
+}
+
+function rectPointDist(r, [x, y]) {
+  return Math.hypot(Math.max(r.x0 - x, 0, x - r.x1), Math.max(r.y0 - y, 0, y - r.y1));
+}
+
+// A free-standing bench: `per` desks along the long axis, one or two rows back to back.
+// rot 0: long axis east-west; rot 90: north-south. For one row, `side` picks which side the chairs are on.
+function benchCandidate(x, y, per, rows, rot, side) {
+  const S = STANDARDS, len = per * S.deskW, dep = rows * S.deskD, cz = S.chairZone;
+  const rect = rot === 0 ? { x0: x, y0: y, x1: x + len, y1: y + dep } : { x0: x, y0: y, x1: x + dep, y1: y + len };
+  const lowSide = rot === 0 ? { ...rect, y0: rect.y0 - cz, y1: rect.y0 } : { ...rect, x0: rect.x0 - cz, x1: rect.x0 };
+  const highSide = rot === 0 ? { ...rect, y0: rect.y1, y1: rect.y1 + cz } : { ...rect, x0: rect.x1, x1: rect.x1 + cz };
+  const access = rows === 2 ? [lowSide, highSide] : [side ? highSide : lowSide];
+  return { kind: 'bench', rot, per, rows, side, desks: per * rows, h: S.deskH, rect, access };
+}
+
+function placeBenches(ctx, count, strategy, fast) {
+  const S = STANDARDS, site = ctx.site, { width: W, depth: D } = site, g = fast ? 400 : S.grid;
+  const { rot: prefRot, anchor } = benchAnchor(site, strategy);
+  let placed = 0;
+  while (placed < count) {
+    const left = count - placed;
+    const shapes = [];
+    for (let per = Math.min(S.benchMaxPerSide, Math.floor(left / 2)); per >= 1; per--) shapes.push([per, 2]);
+    for (let per = Math.min(S.benchMaxPerSide, left); per >= 1; per--) shapes.push([per, 1]);
+    let got = null;
+    for (const [per, rows] of shapes) {
+      const cands = [];
+      for (const rot of [0, 90]) for (const side of rows === 2 ? [0] : [0, 1]) {
+        const probe = benchCandidate(0, 0, per, rows, rot, side);
+        const bw = probe.rect.x1 - probe.rect.x0, bd = probe.rect.y1 - probe.rect.y0;
+        for (let x = 0; x + bw <= W + EPS; x += g) for (let y = 0; y + bd <= D + EPS; y += g) cands.push(benchCandidate(x, y, per, rows, rot, side));
+      }
+      // Every bench is drawn towards the anchor (the window wall, or the middle for compact); later benches
+      // are kept in line with earlier ones, so they form parallel rows rather than a stagger.
+      const benches = ctx.items.filter((it) => it.kind === 'bench');
+      const inLine = (c) => benches.some((b) => b.rot === c.rot &&
+        (Math.abs(b.rect.x0 - c.rect.x0) < EPS || Math.abs(b.rect.y0 - c.rect.y0) < EPS || Math.abs(b.rect.x1 - c.rect.x1) < EPS || Math.abs(b.rect.y1 - c.rect.y1) < EPS));
+      const score = (c) => (c.rot === prefRot ? 0 : 3000) + (benches.length && !inLine(c) ? 2000 : 0) + rectPointDist(c.rect, anchor);
+      // look ahead: prefer a position that still leaves room for the desks after this bench
+      const rest = left - per * rows;
+      got = fast ? pickFast(ctx, cands, score)
+        : placeBest(ctx, cands, score, rest > 0 ? { count: rest, strategy, layout: 'benches' } : null);
+      if (got) break;
+    }
+    if (!got) break;
+    if (!fast) got.id = `BENCH-${String(++ctx.counters.bench).padStart(2, '0')}`;
+    placed += got.desks;
+  }
+  return placed;
+}
+
+// Look-ahead variant of placeBest: best-scoring candidate that fits, without the reachability test.
+function pickFast(ctx, cands, score) {
+  let best = null, bestK = Infinity;
+  for (const c of cands) {
+    const k = score(c);
+    if (k < bestK && canPlace(ctx, c)) { best = c; bestK = k; }
+  }
+  if (best) ctx.items.push(best);
+  return best;
+}
+
 // How many of the desks still to come would fit if `cand` were placed.
+// Also returns how far the benches it would add sit from the bench anchor, to break ties.
 function desksAfter(ctx, cand, count, strategy) {
   const sim = { ...ctx, items: [...ctx.items, cand] };
-  return placeDesks(sim, count, strategy, true);
+  const fit = placeDesks(sim, count, strategy, true);
+  const anchor = benchAnchor(ctx.site, strategy).anchor;
+  const spread = sim.items.slice(ctx.items.length + 1).filter((it) => it.kind === 'bench').reduce((t, it) => t + rectPointDist(it.rect, anchor), 0);
+  return { fit, spread };
+}
+
+// Daylight and meeting: benches run at right angles to the main window wall and gather towards it.
+// Compact (or no windows): along the room, gathered in the middle.
+function benchAnchor(site, strategy) {
+  const { width: W, depth: D } = site;
+  const winWall = [...WALLS].sort((a, b) => windowLength(site, b) - windowLength(site, a))[0];
+  if (strategy === 'compact' || windowLength(site, winWall) === 0) return { rot: W >= D ? 0 : 90, anchor: [W / 2, D / 2] };
+  return { rot: winWall === 'N' || winWall === 'S' ? 90 : 0, anchor: wallPoint(site, winWall, wallLength(site, winWall) / 2, 0) };
 }
 
 // Try candidates best-first; accept the first that keeps every placed item reachable.
@@ -304,9 +410,16 @@ function desksAfter(ctx, cand, count, strategy) {
 function placeBest(ctx, cands, score, ahead) {
   let valid = cands.filter((c) => canPlace(ctx, c)).map((c) => ({ c, k: score(c), fit: 0 }));
   if (ahead && ahead.count > 0 && valid.length) {
-    const stride = Math.max(1, Math.floor(valid.length / 150));
-    valid = valid.filter((_, i) => i % stride === 0);
-    for (const v of valid) v.fit = desksAfter(ctx, v.c, ahead.count, ahead.strategy);
+    // the best-scoring candidates plus an even sample of the rest
+    const n = ahead.layout === 'walls' ? 150 : 30;
+    const stride = Math.max(1, Math.floor(valid.length / n));
+    const top = [...valid].sort((a, b) => a.k - b.k).slice(0, ahead.layout === 'walls' ? 20 : 12);
+    valid = [...new Set([...top, ...valid.filter((_, i) => i % stride === 0)])];
+    for (const v of valid) {
+      const { fit, spread } = desksAfter(ctx, v.c, ahead.count, ahead.strategy);
+      v.fit = Math.min(ahead.count, fit);
+      v.k += spread;
+    }
   }
   valid.sort((a, b) => b.fit - a.fit || a.k - b.k);
   let tested = 0;
@@ -344,16 +457,17 @@ function placeBooths(ctx, count, strategy, ahead) {
   return placed;
 }
 
-function placeTable(ctx, seats, ahead) {
+function placeTable(ctx, seats, shape, ahead) {
   const S = STANDARDS, site = ctx.site, { width: W, depth: D } = site;
-  const { length, depth } = tableSize(seats);
+  const round = shape === 'round';
+  const { length, depth } = round ? { length: roundDiameter(seats), depth: roundDiameter(seats) } : tableSize(seats);
   const cands = [];
-  for (const rot of [0, 90]) {
+  for (const rot of round ? [0] : [0, 90]) {
     const tw = rot === 0 ? length : depth, td = rot === 0 ? depth : length;
     for (let x = S.tableRing; x + tw + S.tableRing <= W + EPS; x += S.grid) {
       for (let y = S.tableRing; y + td + S.tableRing <= D + EPS; y += S.grid) {
         const rect = { x0: x, y0: y, x1: x + tw, y1: y + td };
-        cands.push({ kind: 'table', rot, lw: length, ld: depth, h: S.tableH, seats, rect, access: [expand(rect, S.tableRing)] });
+        cands.push({ kind: 'table', shape: round ? 'round' : 'rect', rot, lw: length, ld: depth, h: S.tableH, seats, rect, access: [expand(rect, S.tableRing)] });
       }
     }
   }
@@ -400,8 +514,7 @@ function unreachable(ctx) {
     }
   }
   const out = [];
-  for (const it of ctx.items) {
-    const zone = it.access[0];
+  const reached = (it, zone) => {
     let hit = false;
     const i0 = Math.max(0, Math.floor(zone.x0 / g)), i1 = Math.min(nx - 1, Math.floor(zone.x1 / g));
     const j0 = Math.max(0, Math.floor(zone.y0 / g)), j1 = Math.min(ny - 1, Math.floor(zone.y1 / g));
@@ -410,28 +523,73 @@ function unreachable(ctx) {
       if (seen[j * nx + i] && cx > zone.x0 && cx < zone.x1 && cy > zone.y0 && cy < zone.y1 &&
         !(cx > it.rect.x0 && cx < it.rect.x1 && cy > it.rect.y0 && cy < it.rect.y1)) hit = true;
     }
-    if (!hit) out.push(it);
-  }
+    return hit;
+  };
+  for (const it of ctx.items) if (!it.access.every((zone) => reached(it, zone))) out.push(it);
   return out;
 }
 
 // ---------- elements ----------
 
-function chairAt(site, it, s, n, rot, role, id) {
-  const S = STANDARDS;
-  const half = S.chairW / 2;
-  const rect = wallRect(site, it.wall, s - half, s + half, n - half, n + half);
-  return { id, kind: 'chair', role, rot, lw: S.chairW, ld: S.chairD, h: S.chairH, ...rect, of: it.id };
+function chairAt(cx, cy, rot, role, id, of) {
+  const S = STANDARDS, half = S.chairW / 2;
+  return { id, kind: 'chair', role, rot, lw: S.chairW, ld: S.chairD, h: S.chairH, x0: cx - half, y0: cy - half, x1: cx + half, y1: cy + half, of };
+}
+
+// A desk element plus its chair, centred in the chair zone.
+function deskWithChair(desk, chairId) {
+  const S = STANDARDS, [dx, dy] = chairDir(desk.rot), [cx, cy] = centre(desk);
+  const reach = S.deskD / 2 + 350;
+  return [desk, chairAt(cx + dx * reach, cy + dy * reach, (desk.rot + 180) % 360, 'desk', chairId(), desk.id)];
+}
+
+// Split a bench into its desks. Rows sit on the bench's low (south/west) and high side.
+function benchDesks(it, deskId) {
+  const S = STANDARDS, out = [];
+  const rows = it.rows === 2 ? ['low', 'high'] : [it.side ? 'high' : 'low'];
+  for (const [ri, row] of rows.entries()) {
+    for (let k = 0; k < it.per; k++) {
+      const a = k * S.deskW, r = it.rect;
+      const off = it.rows === 2 && ri === 1 ? S.deskD : 0;
+      const rect = it.rot === 0
+        ? { x0: r.x0 + a, x1: r.x0 + a + S.deskW, y0: r.y0 + off, y1: r.y0 + off + S.deskD }
+        : { x0: r.x0 + off, x1: r.x0 + off + S.deskD, y0: r.y0 + a, y1: r.y0 + a + S.deskW };
+      // the chair side decides which way the desk faces
+      const rot = it.rot === 0 ? (row === 'high' ? 0 : 180) : (row === 'high' ? 270 : 90);
+      const [dx, dy] = chairDir(rot);
+      const zone = { x0: dx < 0 ? rect.x0 - S.chairZone : dx > 0 ? rect.x1 : rect.x0, x1: dx < 0 ? rect.x0 : dx > 0 ? rect.x1 + S.chairZone : rect.x1,
+        y0: dy < 0 ? rect.y0 - S.chairZone : dy > 0 ? rect.y1 : rect.y0, y1: dy < 0 ? rect.y0 : dy > 0 ? rect.y1 + S.chairZone : rect.y1 };
+      out.push({ id: deskId(), kind: 'desk', rot, lw: S.deskW, ld: S.deskD, h: S.deskH, ...rect, bench: it.id, access: [zone] });
+    }
+  }
+  return out;
 }
 
 function toElements(site, items) {
   const S = STANDARDS, out = [];
   let chairs = 0;
   const chairId = () => `CHAIR-${String(++chairs).padStart(2, '0')}`;
+  let desks = items.filter((it) => it.kind === 'desk').reduce((m, it) => Math.max(m, Number(it.id.slice(5))), 0);
+  const deskId = () => `DESK-${String(++desks).padStart(2, '0')}`;
   for (const it of items) {
-    out.push({ id: it.id, kind: it.kind, rot: it.rot, lw: it.lw, ld: it.ld, h: it.h, ...it.rect,
-      wall: it.wall, access: it.access.map((a) => ({ ...a })), seats: it.seats });
-    if (it.kind === 'desk') out.push(chairAt(site, it, it.s + S.deskW / 2, S.deskD + 350, (it.rot + 180) % 360, 'desk', chairId()));
+    if (it.kind === 'bench') {
+      for (const d of benchDesks(it, deskId)) out.push(...deskWithChair(d, chairId));
+      continue;
+    }
+    const el = { id: it.id, kind: it.kind, rot: it.rot, lw: it.lw, ld: it.ld, h: it.h, ...it.rect,
+      wall: it.wall, access: it.access.map((a) => ({ ...a })), seats: it.seats };
+    if (it.shape) el.shape = it.shape;
+    if (it.kind === 'desk') { out.push(...deskWithChair(el, chairId)); continue; }
+    out.push(el);
+    if (it.kind === 'table' && it.shape === 'round') {
+      // evenly round the table, first seat to the north; backs face away from the table
+      const [cx, cy] = centre(it.rect), R = it.lw / 2 + 150 + S.chairW / 2;
+      for (let k = 0; k < it.seats; k++) {
+        const deg = 90 + (k * 360) / it.seats, a = (deg * Math.PI) / 180;
+        out.push(chairAt(cx + R * Math.cos(a), cy + R * Math.sin(a), Math.round(deg + 90) % 360, 'meeting', chairId(), it.id));
+      }
+      continue;
+    }
     if (it.kind === 'table') {
       const { perSide } = tableSize(it.seats);
       const long = it.rot === 0 ? 'x' : 'y';
@@ -449,8 +607,7 @@ function toElements(site, items) {
           cx = side ? r.x0 - gap - half : r.x1 + gap + half;
           rot = side ? 270 : 90;
         }
-        out.push({ id: chairId(), kind: 'chair', role: 'meeting', rot, lw: S.chairW, ld: S.chairD, h: S.chairH,
-          x0: cx - half, y0: cy - half, x1: cx + half, y1: cy + half, of: it.id });
+        out.push(chairAt(cx, cy, rot, 'meeting', chairId(), it.id));
       }
     }
   }
@@ -484,13 +641,13 @@ function lexBetter(a, b) {
 }
 
 function runOrder(site, zones, prog, strategy, order) {
-  const ctx = { site, zones, items: [], counters: { desk: 0, booth: 0 } };
+  const ctx = { site, zones, items: [], deskLayout: prog.deskLayout, counters: { desk: 0, booth: 0, bench: 0 } };
   const placed = { desks: 0, booths: 0, table: 0 };
   for (const [i, step] of order.entries()) {
-    const ahead = order.indexOf('desks') > i ? { count: prog.desks, strategy } : null;
+    const ahead = order.indexOf('desks') > i ? { count: prog.desks, strategy, layout: prog.deskLayout } : null;
     if (step === 'desks') placed.desks = placeDesks(ctx, prog.desks, strategy);
     if (step === 'booths') placed.booths = placeBooths(ctx, prog.booths, strategy, ahead);
-    if (step === 'table' && prog.meetingSeats > 0) placed.table = placeTable(ctx, prog.meetingSeats, ahead) ? 1 : 0;
+    if (step === 'table' && prog.meetingSeats > 0) placed.table = placeTable(ctx, prog.meetingSeats, prog.tableShape, ahead) ? 1 : 0;
   }
   return { ctx, placed };
 }
@@ -503,6 +660,14 @@ function resolveProgramme(p, report) {
     const v = Math.max(0, Math.min(max, Math.round(raw)));
     if (v !== raw) report('warn', `programme.${key}`, `Programme ${key} ${raw} adjusted to ${v} (allowed 0–${max}).`);
     out[key] = v;
+  }
+  out.deskLayout = DESK_LAYOUTS[src.deskLayout] ? src.deskLayout : 'walls';
+  if (src.deskLayout !== undefined && out.deskLayout !== src.deskLayout) report('warn', 'programme.deskLayout', `Unknown desk arrangement "${src.deskLayout}"; using desks along the walls.`);
+  out.tableShape = TABLE_SHAPES[src.tableShape] ? src.tableShape : 'rect';
+  if (src.tableShape !== undefined && out.tableShape !== src.tableShape) report('warn', 'programme.tableShape', `Unknown table shape "${src.tableShape}"; using rectangular.`);
+  if (out.tableShape === 'round' && out.meetingSeats > STANDARDS.roundSeatsMax) {
+    report('info', 'programme.tableShape', `A round table seats at most ${STANDARDS.roundSeatsMax}; ${out.meetingSeats} seats use a rectangular table.`);
+    out.tableShape = 'rect';
   }
   return out;
 }
@@ -545,7 +710,8 @@ export function generate(state) {
   if (lost.length) {
     const ids = new Set(lost.map((x) => x.id));
     for (const it of lost) {
-      report('warn', `reach.${it.kind}`, `${it.id} removed: its ${it.kind === 'desk' ? 'chair zone' : 'access zone'} cannot be reached from a door with a ${mm(STANDARDS.passage)} passage.`, { ref: it.id });
+      const what = it.kind === 'bench' ? `${it.id} (${it.desks} desks) removed: a chair zone` : `${it.id} removed: its ${it.kind === 'desk' ? 'chair zone' : 'access zone'}`;
+      report('warn', `reach.${it.kind}`, `${what} cannot be reached from a door with a ${mm(STANDARDS.passage)} passage.`, { ref: it.id });
     }
     ctx.items = ctx.items.filter((it) => !ids.has(it.id));
   }
@@ -565,11 +731,13 @@ export function generate(state) {
   const short = (req, got, what, why) => {
     if (got < req) report('warn', `programme.${what}`, `Placed ${got} of ${req} ${what === 'meetingSeats' ? 'meeting seats' : what}; ${req - got} short. ${why}`, { amount: req - got });
   };
-  short(prog.desks, readouts.desksPlaced, 'desks', 'No more wall run is free of door, window and access clearances.');
+  short(prog.desks, readouts.desksPlaced, 'desks', prog.deskLayout === 'walls'
+    ? 'No more wall run is free of door, window and access clearances. Try "Walls, then benches".'
+    : 'No more wall run or free floor area takes a desk with its 1100 mm chair zone.');
   short(prog.booths, readouts.boothsPlaced, 'booths', 'A booth needs a solid wall stretch of 1100 mm clear of windows and doors.');
   short(prog.meetingSeats, readouts.meetingSeatsPlaced, 'meetingSeats', 'No free area left for the table and its chair ring.');
 
   if (site.openings.length) report('info', 'site.fixed', `Site: ${mm(site.width)} × ${mm(site.depth)}, ${site.openings.length} opening(s).`);
 
-  return { version: 1, tier, strategy, site, zones, elements, checks, readouts, dims: dimensionChains(site) };
+  return { version: 1, tier, strategy, deskLayout: prog.deskLayout, tableShape: prog.tableShape, site, zones, elements, checks, readouts, dims: dimensionChains(site) };
 }

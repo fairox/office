@@ -147,6 +147,18 @@ try {
   await page.click('[data-testid="toggle-fix"]');
   ok(!(await page.locator('[data-testid="site.width"]').isDisabled()), 'site width unlocked after release');
 
+  // desk arrangement and table shape
+  console.log('Programme options');
+  await setField('preset', 'team8');
+  await setField('programme.deskLayout', 'benches');
+  L = await layout();
+  ok(L.deskLayout === 'benches' && L.elements.some((e) => e.bench), 'choosing benches gives bench desks');
+  await setField('programme.tableShape', 'round');
+  L = await layout();
+  ok(L.elements.some((e) => e.kind === 'table' && e.shape === 'round'), 'choosing round gives a round table');
+  ok(await page.locator('#plan circle[data-kind="table"]').count() === 1, 'round table drawn as a circle');
+  await page.screenshot({ path: path.join(SHOTS, 'team8-benches-round.png') });
+
   // clearances on, for the screenshot set
   await setField('preset', 'team8');
   await page.check('[data-testid="show-zones"]');

@@ -15,6 +15,7 @@ honest checks. Archicad building is planned as a later phase. Users should read
 | 5 | Library objects, multiple floors, IFC classification | not started |
 
 The spec sections we have are in [docs/SPEC.md](docs/SPEC.md). Sections 1–9 are missing.
+Reference drawings and what was taken from them: [docs/REFERENCES.md](docs/REFERENCES.md).
 
 ## Layout
 
@@ -59,16 +60,22 @@ case at the bottom of it for every bug you fix.
 
 ## Defaults chosen (change if your standard differs)
 
-These are in `STANDARDS` in `web/generator.js`:
+These are in `STANDARDS` in `web/generator.js`. Clearances follow the Dimensions.com
+"Private Office Clearances" sheet where it gives a figure; see [docs/REFERENCES.md](docs/REFERENCES.md).
 
 | | |
 |---|---|
-| Desk | 1600 × 800 mm, 740 mm high, 1000 mm chair zone behind |
+| Desk | 1600 × 800 mm, 740 mm high, 1100 mm chair zone behind (sheet: desk back clearance 1070–1520) |
+| Bench | free-standing, back to back, up to 3 desks a side, 1100 mm chair zone on each side |
 | Phone booth | 1100 × 1100 mm, 2200 mm high, 900 mm clear in front |
-| Meeting table | 700 mm per seat along each long side, 1000 mm deep (800 for ≤ 2 seats), 800 mm chair ring |
+| Meeting table | rectangular: 700 mm per seat a side, 1000 mm deep (800 for ≤ 2 seats); round: 1070 / 1220 / 1520 mm for 4 / 6 / 8 seats; 760 mm table zone (sheet: 560–760) |
 | Door clearance | swing (leaf width, inward doors) + threshold 1500 mm deep, 300 mm beyond each jamb |
 | Window band | nothing taller than the sill within 1000 mm of the window |
-| Route | 900 mm clear passage from a door to every chair zone, booth front and the table ring |
+| Route | 900 mm clear passage from a door to every chair zone, booth front and the table zone |
+
+Desk arrangement: **Along the walls**, **Back-to-back benches**, or **Walls, then benches**.
+Benches run at right angles to the main window wall and gather towards it (Compact: along the
+room, in the middle); a look-ahead picks positions that leave room for the remaining desks.
 
 Strategies: **Daylight first** (booths, desks, table), **Meeting first** (table, booths, desks)
 and **Compact** (desks, booths, table). Each tries its own order first, then other orders,

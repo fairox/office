@@ -1,5 +1,5 @@
 // UI: state, panels, persistence (URL hash + localStorage) and the two views.
-import { generate, STRATEGIES, TIERS, WALLS, WALL_CORNERS, offsetFromRef } from './generator.js';
+import { generate, STRATEGIES, TIERS, WALLS, WALL_CORNERS, DESK_LAYOUTS, TABLE_SHAPES, offsetFromRef } from './generator.js';
 import { PRESETS, DEFAULT_PRESET, presetState } from './presets.js';
 import { drawPlan } from './plan.js';
 
@@ -108,6 +108,10 @@ function renderSide() {
       ${num('programme.meetingSeats', 'Meeting seats', s.programme.meetingSeats, { unit: false, min: 0 })}
       ${num('programme.booths', 'Phone booths', s.programme.booths, { unit: false, min: 0 })}
     </div>
+    <div class="grid2" style="margin-top:6px">
+      ${sel('programme.deskLayout', 'Desk arrangement', s.programme.deskLayout || 'walls', Object.entries(DESK_LAYOUTS))}
+      ${sel('programme.tableShape', 'Meeting table', s.programme.tableShape || 'rect', Object.entries(TABLE_SHAPES))}
+    </div>
     <div style="margin-top:6px">${sel('strategy', 'Strategy', s.strategy, Object.entries(STRATEGIES).map(([k, v]) => [k, v.label]))}</div>
     <p class="note">${esc(STRATEGIES[layout.strategy].note)}</p>
   </section>
@@ -169,7 +173,10 @@ function applyField(path, raw) {
   }
   if (path === 'strategy' || path === 'tier') { state[path] = raw; return false; }
   if (parts[0] === 'site') { state.site[parts[1]] = Number(raw); return false; }
-  if (parts[0] === 'programme') { state.programme[parts[1]] = Number(raw); return false; }
+  if (parts[0] === 'programme') {
+    state.programme[parts[1]] = ['deskLayout', 'tableShape'].includes(parts[1]) ? raw : Number(raw);
+    return false;
+  }
   if (parts[0] === 'op') {
     const o = state.site.openings[Number(parts[1])], key = parts[2];
     if (!o) return false;

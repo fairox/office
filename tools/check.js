@@ -21,6 +21,13 @@ function expect(name, cond, msg) {
 
 const clone = (x) => JSON.parse(JSON.stringify(x));
 const ov = (a, b) => a.x0 < b.x1 - EPS && b.x0 < a.x1 - EPS && a.y0 < b.y1 - EPS && b.y0 < a.y1 - EPS;
+// Round tables are circles; everything else is its rectangle.
+const circleHitsRect = (t, r) => {
+  const cx = (t.x0 + t.x1) / 2, cy = (t.y0 + t.y1) / 2, rad = (t.x1 - t.x0) / 2;
+  const dx = Math.max(r.x0 - cx, 0, cx - r.x1), dy = Math.max(r.y0 - cy, 0, cy - r.y1);
+  return Math.hypot(dx, dy) < rad - EPS;
+};
+const hits = (a, b) => (a.shape === 'round' ? circleHitsRect(a, b) : b.shape === 'round' ? circleHitsRect(b, a) : ov(a, b));
 const rectStr = (r) => `[${Math.round(r.x0)},${Math.round(r.y0)}–${Math.round(r.x1)},${Math.round(r.y1)}]`;
 
 // Independent wall maths: each wall as start corner + unit direction + inward normal.
@@ -73,7 +80,7 @@ function verify(name, state, layout, { clean = false } = {}) {
   // no overlaps
   for (let i = 0; i < els.length; i++) for (let j = i + 1; j < els.length; j++) {
     const a = els[i], b = els[j];
-    expect(name, !ov(a, b), `${a.id} ${rectStr(a)} overlaps ${b.id} ${rectStr(b)}`);
+    expect(name, !hits(a, b), `${a.id} ${rectStr(a)} overlaps ${b.id} ${rectStr(b)}`);
   }
   for (const a of furniture) for (const b of furniture) {
     if (a === b) continue;
@@ -83,6 +90,22 @@ function verify(name, state, layout, { clean = false } = {}) {
     const owner = furniture.find((f) => f.id === c.of);
     expect(name, !!owner, `${c.id} belongs to a missing element ${c.of}`);
     if (owner && owner.kind === 'desk') expect(name, ov(c, owner.access[0]), `${c.id} is not in its desk's chair zone`);
+  }
+  // desk back clearance (Dimensions.com sheet: 1070–1520 mm) and table zone (560–760 mm)
+  for (const d of els.filter((e) => e.kind === 'desk')) {
+    const z = d.access[0], depth = d.rot % 180 === 0 ? z.y1 - z.y0 : z.x1 - z.x0, width = d.rot % 180 === 0 ? z.x1 - z.x0 : z.y1 - z.y0;
+    expect(name, depth >= 1070 - EPS && depth <= 1520 + EPS, `${d.id} chair zone is ${depth} mm deep (sheet: 1070–1520)`);
+    expect(name, Math.abs(width - Math.max(d.x1 - d.x0, d.y1 - d.y0)) < EPS, `${d.id} chair zone is not as wide as the desk`);
+    const touching = (d.rot === 0 && Math.abs(z.y0 - d.y1) < EPS) || (d.rot === 180 && Math.abs(z.y1 - d.y0) < EPS) ||
+      (d.rot === 90 && Math.abs(z.x1 - d.x0) < EPS) || (d.rot === 270 && Math.abs(z.x0 - d.x1) < EPS);
+    expect(name, touching, `${d.id} (rot ${d.rot}) chair zone is not on its chair side`);
+  }
+  for (const t of els.filter((e) => e.kind === 'table')) {
+    const ring = t.access[0].x0 - t.x0;
+    expect(name, -ring >= 560 - EPS && -ring <= 760 + EPS, `${t.id} table zone ${-ring} mm (sheet: 560–760)`);
+    for (const c of chairs.filter((x) => x.of === t.id)) {
+      expect(name, c.x0 >= t.access[0].x0 - EPS && c.x1 <= t.access[0].x1 + EPS && c.y0 >= t.access[0].y0 - EPS && c.y1 <= t.access[0].y1 + EPS, `${c.id} sits outside the table zone of ${t.id}`);
+    }
   }
 
   // door swing, threshold, window band (re-derived from the input)
@@ -198,6 +221,11 @@ const stress = {
   'zero programme': [mk({ width: 6000, depth: 5000, openings: [door('DOOR-1', 'S', 'SW', 500)] }, { desks: 0, meetingSeats: 0, booths: 0 })],
   'corridor-like room, door mid long wall': [mk({ width: 10800, depth: 2600, openings: [door('DOOR-1', 'S', 'SW', 4900)] }, { desks: 6, meetingSeats: 4, booths: 1 })],
   'window head above the ceiling': [mk({ width: 6000, depth: 5000, height: 2400, openings: [door('DOOR-1', 'S', 'SW', 500), win('WIN-1', 'N', 'NW', 500, 2000, { sill: 1200 })] }, { desks: 4, meetingSeats: 0, booths: 0 }), { expectCodes: ['opening.height'] }],
+  'benches in a tiny room': [mk({ width: 3000, depth: 3000, openings: [door('DOOR-1', 'S', 'SW', 900)] }, { desks: 6, meetingSeats: 0, booths: 0, deskLayout: 'benches' }), { expectCodes: ['programme.desks'] }],
+  'benches, odd count': [mk({ width: 9000, depth: 9000, openings: [door('DOOR-1', 'S', 'SW', 600), win('WIN-1', 'E', 'SE', 1000, 6000)] }, { desks: 7, meetingSeats: 4, booths: 1, deskLayout: 'benches', tableShape: 'round' })],
+  'large room, mixed': [mk({ width: 18000, depth: 12000, openings: [door('DOOR-1', 'S', 'SW', 1500), door('DOOR-2', 'N', 'NE', 1500), win('WIN-1', 'W', 'SW', 1000, 10000)] }, { desks: 30, meetingSeats: 8, booths: 2, deskLayout: 'mixed', tableShape: 'round' })],
+  'round table over 8 seats': [mk({ width: 9000, depth: 7000, openings: [door('DOOR-1', 'S', 'SW', 600)] }, { desks: 4, meetingSeats: 10, booths: 0, tableShape: 'round' }), { expectCodes: ['programme.tableShape'] }],
+  'unknown desk arrangement': [mk({ width: 6000, depth: 5000, openings: [door('DOOR-1', 'S', 'SW', 500)] }, { desks: 2, meetingSeats: 0, booths: 0, deskLayout: 'pods' }), { expectCodes: ['programme.deskLayout'] }],
   'unknown strategy and tier': [{ ...mk({ width: 6000, depth: 5000, openings: [door('DOOR-1', 'S', 'SW', 500)] }, { desks: 2, meetingSeats: 2, booths: 0 }, 'bogus'), tier: 'Q' }, { expectCodes: ['strategy', 'tier'] }],
 };
 for (const [name, [state, opts]] of Object.entries(stress)) {
@@ -223,6 +251,26 @@ console.log('Regressions');
   // Desks placed after the table used to cut off the route to it (narrow6 / meeting).
   const L = generate(presetState('narrow6', 'meeting'));
   expect('reg: narrow6 meeting reach', !L.checks.some((c) => c.code.startsWith('reach.')), 'items removed for reachability');
+  cases++;
+}
+
+{
+  // Desk chair zones were 1000 mm, below the 1070 mm minimum desk back clearance on the reference sheet.
+  for (const key of Object.keys(PRESETS)) {
+    const L = generate(presetState(key));
+    for (const d of L.elements.filter((e) => e.kind === 'desk')) {
+      const z = d.access[0];
+      expect(`reg: ${key} chair zone`, Math.min(z.x1 - z.x0, z.y1 - z.y0) >= 1070, `${d.id} chair zone below 1070 mm`);
+    }
+  }
+  cases++;
+}
+{
+  // Bench presets must actually produce benches (desks not touching a wall).
+  for (const key of ['exec6', 'open12']) {
+    const L = generate(presetState(key));
+    expect(`reg: ${key} benches`, L.elements.some((e) => e.kind === 'desk' && e.bench), 'no bench desks');
+  }
   cases++;
 }
 

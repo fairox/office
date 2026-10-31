@@ -58,7 +58,10 @@ export function drawPlan(svg, layout, { showZones = false } = {}) {
   for (const e of layout.elements) {
     const cls = e.kind === 'chair' ? 'chair' : e.kind;
     const extra = `data-id="${esc(e.id)}" data-kind="${e.kind}"${e.kind === 'chair' ? ' rx="80"' : ''}`;
-    out.push(rect(e, cls, extra));
+    if (e.shape === 'round') {
+      const [cx, cy] = P((e.x0 + e.x1) / 2, (e.y0 + e.y1) / 2);
+      out.push(`<circle class="${cls}" cx="${cx}" cy="${cy}" r="${(e.x1 - e.x0) / 2}" ${extra}/>`);
+    } else out.push(rect(e, cls, extra));
     if (showZones && e.access) for (const a of e.access) out.push(rect(a, 'z-access'));
   }
   for (const e of layout.elements) {

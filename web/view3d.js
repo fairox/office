@@ -85,6 +85,13 @@ export class View3D {
           ? [{ ...e, x1: e.x0 + 30 }, { ...e, x0: e.x1 - 30 }]
           : [{ ...e, y1: e.y0 + 30 }, { ...e, y0: e.y1 - 30 }];
         for (const p of ends) this.box(p, 0, e.h - 25, this.mat('deskLeg'));
+      } else if (e.kind === 'table' && e.shape === 'round') {
+        const top = new THREE.Mesh(new THREE.CylinderGeometry((e.x1 - e.x0) / 2, (e.x1 - e.x0) / 2, 30, 48), this.mat('table'));
+        top.rotation.x = Math.PI / 2;
+        top.position.set((e.x0 + e.x1) / 2, (e.y0 + e.y1) / 2, e.h - 15);
+        this.root.add(top);
+        const cx = (e.x0 + e.x1) / 2, cy = (e.y0 + e.y1) / 2;
+        this.box({ x0: cx - 120, y0: cy - 120, x1: cx + 120, y1: cy + 120 }, 0, e.h - 30, this.mat('deskLeg'));
       } else if (e.kind === 'table') {
         this.box(e, e.h - 30, e.h, this.mat('table'));
         const cx = (e.x0 + e.x1) / 2, cy = (e.y0 + e.y1) / 2;
