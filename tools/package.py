@@ -3,9 +3,9 @@
 
     python3 tools/package.py
 
-Launchers get their line endings (.bat CRLF) and exec bits fixed in the zip, and a stale
-archicad/OfficeBuild.py bundle is refused,
-whatever the checkout looks like. Uncommitted changes are not packaged.
+Launchers get their line endings (.bat CRLF) and exec bits fixed in the zip, whatever the
+checkout looks like. A stale archicad/OfficeBuild.py bundle is refused. Uncommitted changes
+are not packaged.
 """
 import datetime
 import os
