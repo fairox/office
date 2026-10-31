@@ -3,7 +3,8 @@
 
     python3 tools/package.py
 
-Launchers get their line endings (.bat CRLF) and exec bits fixed in the zip,
+Launchers get their line endings (.bat CRLF) and exec bits fixed in the zip, and a stale
+archicad/OfficeBuild.py bundle is refused,
 whatever the checkout looks like. Uncommitted changes are not packaged.
 """
 import datetime
@@ -25,6 +26,11 @@ EXECUTABLE_FILES = {"serve.py", "tools/package.py", "archicad/OfficeBuild.py", "
 # The single-file script for Tapir's palette must match the sources it is generated from.
 BUNDLE = "archicad/OfficeBuild.py"
 BUNDLE_SOURCES = ("archicad/build_office.py", "archicad/office_gui.py")
+
+
+def git(*args, binary=False):
+    out = subprocess.check_output(["git", *args], cwd=ROOT)
+    return out if binary else out.decode("utf-8")
 
 
 def check_bundle(files):
