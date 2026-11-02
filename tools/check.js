@@ -6,6 +6,7 @@
 import { generate, STRATEGIES, TIERS, STANDARDS } from '../web/generator.js';
 import { PRESETS, presetState } from '../web/presets.js';
 import { buildFile, LAYERS } from '../web/buildfile.js';
+import { runM } from './check_m.js';
 
 const verbose = process.argv.includes('--verbose');
 const EPS = 0.5;
@@ -184,7 +185,7 @@ function runCase(name, state, opts = {}) {
 // ---------- presets x tiers x strategies ----------
 console.log('Presets x tiers x strategies');
 for (const key of Object.keys(PRESETS)) {
-  for (const tier of Object.keys(TIERS)) {
+  for (const tier of Object.keys(TIERS).filter((t) => t !== 'M')) {   // tier M has its own floor-plate presets (check_m.js)
     const sites = [];
     for (const strategy of Object.keys(STRATEGIES)) {
       const st = presetState(key, strategy);
@@ -275,6 +276,9 @@ console.log('Regressions');
   }
   cases++;
 }
+
+// ---------- tier M ----------
+cases += runM({ expect, runCaseHooks: { verbose } });
 
 // ---------- build files ----------
 console.log('Build files');

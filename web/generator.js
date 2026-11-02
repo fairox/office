@@ -8,6 +8,8 @@
 
 // Clearances follow the Dimensions.com "Private Office Clearances" sheet where it gives one:
 // desk back clearance 1070–1520 mm, table zone 560–760 mm (table edge to outside of the chairs).
+import { generateM } from './generator_m.js';
+
 export const STANDARDS = Object.freeze({
   deskW: 1600, deskD: 800, deskH: 740,
   chairZone: 1100,           // desk back clearance: free depth behind a desk for the chair (sheet: 1070–1520)
@@ -34,7 +36,7 @@ export const STRATEGIES = Object.freeze({
 
 export const TIERS = Object.freeze({
   S: { label: 'S: single room', available: true },
-  M: { label: 'M: floor with columns and a core (phase 3)', available: false },
+  M: { label: 'M: floor plate with columns and a core', available: true },
   L: { label: 'L: multi-core floor (phase 4)', available: false },
 });
 
@@ -686,6 +688,11 @@ export function generate(state) {
   if (!STRATEGIES[strategy]) {
     if (strategy !== undefined) report('warn', 'strategy', `Unknown strategy "${strategy}"; using daylight.`);
     strategy = 'daylight';
+  }
+
+  if (tier === 'M') {
+    const out = generateM(st, report, strategy);
+    return { version: 1, tier, ...out, strategy, checks };
   }
 
   const site = resolveSite(st.site, report);
