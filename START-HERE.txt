@@ -31,6 +31,13 @@ benches, a meeting table, phone booths) in your browser, with a 3D view, a dimen
      without a message there.
    - Your work is saved in the browser and in the page address: copy the
      address to send someone exactly what you see.
+   - Tier M (whole floor plates): choose "M" under Tier. Give the outline
+     (or make one from a Rectangle / L / U / T shape), the doors and windows
+     on its edges, the column grid and the core. Then ask for teams, rooms,
+     booths. A primary aisle (the spine) is laid out, rooms line up along it,
+     and team benches fill the rest. Pin a room to keep it exactly where you
+     put it. "Furthest from an exit" shows the longest walk to an exit; set
+     the limit your escape rules require (45 m is only a placeholder).
 
 4. BUILD IN ARCHICAD
    You need Archicad with the Tapir add-on (1.7.x), and Python with Tkinter

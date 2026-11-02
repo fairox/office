@@ -3,6 +3,7 @@
 // south-west corner, x east, y north, z up from the story level); `placement` moves and turns
 // that frame into the project.
 import { WALLS, wallLength } from './generator.js';
+import { edgesOf } from './generator_m.js';
 
 export const BUILD_FORMAT = 'office-configurator-build';
 export const BUILD_VERSION = 1;
@@ -16,6 +17,7 @@ export const LAYERS = Object.freeze({
 export const MATERIALS = Object.freeze({
   deskTop: ['Oak', '#d9c7a5'], steel: ['Steel', '#5d636b'], fabric: ['Fabric', '#46505c'],
   tableTop: ['Oak', '#c9b38c'], felt: ['Felt', '#6f9c8a'], feltDark: ['Felt', '#3f5f53'],
+  storage: ['Laminate', '#8f969e'], concrete: ['Concrete', '#b9bcc0'],
 });
 
 const m = (mm) => Math.round(mm * 10) / 10000; // mm -> m, rounded to 0.1 mm
@@ -62,6 +64,10 @@ function partsOf(el) {
   } else if (el.kind === 'booth') {
     out.push(box(`${el.id}-BODY`, el, 'body', L, 'felt', el.x0, el.y0, 0, el.x1, el.y1, el.h - 60));
     out.push(box(`${el.id}-ROOF`, el, 'roof', L, 'feltDark', el.x0, el.y0, el.h - 60, el.x1, el.y1, el.h));
+  } else if (el.kind === 'storage') {
+    out.push(box(`${el.id}`, el, 'body', LAYERS.storage, 'storage', el.x0, el.y0, 0, el.x1, el.y1, el.h));
+  } else if (el.kind === 'column' || el.kind === 'core') {
+    out.push({ ...box(`${el.id}`, { ...el, kind: 'structure' }, el.kind, LAYERS.walls, 'concrete', el.x0, el.y0, 0, el.x1, el.y1, el.h), site: true });
   }
   return out;
 }
@@ -79,7 +85,74 @@ export function slug(name) {
   return String(name || 'office').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'office';
 }
 
+// Tier M: walls along the outline (reference line on the wall centre, mitred at the corners), rooms as
+// partitions with a threshold (gap + beam hung from the ceiling) for their entrance, rooms and
+// neighbourhoods as zones. The model is shifted so the outline's corner is the origin.
+function buildFileM(state, layout, { name, created }) {
+  const site = layout.site, t = site.wall, H = site.height, bb = site.bbox, dx = -bb.x0, dy = -bb.y0;
+  const sx = (x) => x + dx, sy = (y) => y + dy;
+  const S = (r) => ({ ...r, x0: sx(r.x0), x1: sx(r.x1), y0: sy(r.y0), y1: sy(r.y1) });
+  const poly = site.outline, edges = edgesOf(poly);
+  const out = (e) => [e.dir[1], -e.dir[0]];
+  const mid = poly.map((v, i) => {
+    const a = out(edges[(i + edges.length - 1) % edges.length]), b = out(edges[i]);
+    return [sx(v[0]) + (a[0] + b[0]) * t / 2, sy(v[1]) + (a[1] + b[1]) * t / 2];
+  });
+  const walls = edges.map((e, i) => {
+    const beg = mid[i], end = mid[(i + 1) % mid.length];
+    return { key: `WALL-${e.id}`, site: true, layer: LAYERS.walls, beg: beg.map(m), end: end.map(m), thickness: m(t), height: m(H), length: m(Math.hypot(end[0] - beg[0], end[1] - beg[1])) };
+  });
+  const openings = site.openings.map((o) => {
+    const e = edges[o.edge], w = mid[o.edge];
+    const c = [sx(e.a[0]) + e.dir[0] * (o.s0 + o.s1) / 2, sy(e.a[1]) + e.dir[1] * (o.s0 + o.s1) / 2];
+    return { key: o.id, kind: o.kind, wall: `WALL-${e.id}`, layer: LAYERS.walls, centerOffset: m((c[0] - w[0]) * e.dir[0] + (c[1] - w[1]) * e.dir[1]),
+      width: m(o.s1 - o.s0), height: m(o.height), sill: m(o.sill), swing: o.kind === 'door' ? o.swing : undefined, hinge: o.kind === 'door' ? o.hinge : undefined };
+  });
+  const els = layout.elements.map((e) => S(e));
+  const P = 100, doorH = 2100, beams = [];
+  for (const p of els.filter((e) => e.kind === 'partition')) {
+    const horiz = p.x1 - p.x0 >= p.y1 - p.y0, cy = (p.y0 + p.y1) / 2, cx = (p.x0 + p.x1) / 2;
+    walls.push({ key: p.id, site: false, layer: LAYERS.rooms, thickness: m(P), height: m(H),
+      beg: horiz ? [m(p.x0), m(cy)] : [m(cx), m(p.y0)], end: horiz ? [m(p.x1), m(cy)] : [m(cx), m(p.y1)], length: m(Math.max(p.x1 - p.x0, p.y1 - p.y0)) });
+  }
+  const zones = [];
+  let num = 0;
+  for (const r of els.filter((e) => e.kind === 'room')) {
+    // the entrance: a gap in the front partition with a beam hung from the ceiling over it
+    const f = r.front, d0 = r.door[0] + (f === 'N' || f === 'S' ? dx : dy), d1 = r.door[1] + (f === 'N' || f === 'S' ? dx : dy);
+    const line = f === 'N' ? r.y1 - P / 2 : f === 'S' ? r.y0 + P / 2 : f === 'E' ? r.x1 - P / 2 : r.x0 + P / 2;
+    beams.push({ key: `${r.id}-THR`, layer: LAYERS.rooms, width: m(P), height: m(H - doorH), top: m(H),
+      beg: f === 'N' || f === 'S' ? [m(d0), m(line)] : [m(line), m(d0)], end: f === 'N' || f === 'S' ? [m(d1), m(line)] : [m(line), m(d1)] });
+    zones.push({ key: `ZONE-${r.id}`, name: r.name, number: String(++num).padStart(2, '0'), category: r.category, layer: LAYERS.rooms, height: m(H),
+      polygon: [[r.x0, r.y0], [r.x1, r.y0], [r.x1, r.y1], [r.x0, r.y1]].map((q) => q.map(m)) });
+  }
+  for (const n of layout.neighbourhoods || []) {
+    n.rects.forEach((r0, i) => {
+      const r = S(r0);
+      zones.push({ key: `ZONE-${n.id}-${i + 1}`, name: n.rects.length > 1 ? `${n.name} ${i + 1}/${n.rects.length}` : n.name, number: String(++num).padStart(2, '0'),
+        category: 'open office', layer: LAYERS.rooms, height: m(H), polygon: [[r.x0, r.y0], [r.x1, r.y0], [r.x1, r.y1], [r.x0, r.y1]].map((q) => q.map(m)) });
+    });
+  }
+  const boxes = els.filter((e) => e.kind !== 'room' && e.kind !== 'partition').flatMap(partsOf);
+  const pl = state.placement && typeof state.placement === 'object' ? state.placement : {};
+  const rot = (Number(pl.rotationDeg) || 0) * Math.PI / 180, o = Array.isArray(pl.origin) ? pl.origin.map(Number) : [0, 0, 0];
+  // moving the model by (dx, dy) moves the placement origin back by the same amount, turned with the placement
+  const ox = o[0] - (Math.cos(rot) * dx - Math.sin(rot) * dy) / 1000, oy = o[1] - (Math.sin(rot) * dx + Math.cos(rot) * dy) / 1000;
+  return {
+    format: BUILD_FORMAT, version: BUILD_VERSION, created, name, mode: 'replace', walls: !pl.fromZone,
+    placement: { origin: [Math.round(ox * 1e4) / 1e4, Math.round(oy * 1e4) / 1e4, o[2] || 0], rotationDeg: Number(pl.rotationDeg) || 0, story: Number(pl.story) || 0 },
+    model: {
+      units: 'm', tier: 'M', strategy: layout.strategy,
+      site: { width: m(bb.x1 - bb.x0), depth: m(bb.y1 - bb.y0), height: m(H), wallThickness: m(t) },
+      walls, openings, beams, zones, boxes,
+      checks: layout.checks.filter((c) => c.level === 'error' || c.level === 'warn').map(({ level, code, msg }) => ({ level, code, msg })),
+      readouts: layout.readouts,
+    },
+  };
+}
+
 export function buildFile(state, layout, { name = 'Office', created = new Date().toISOString() } = {}) {
+  if (layout.tier === 'M') return buildFileM(state, layout, { name, created });
   const site = layout.site, t = site.wall;
   const placement = state.placement && typeof state.placement === 'object' ? state.placement : null;
   const walls = siteWalls(site);

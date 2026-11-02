@@ -3,7 +3,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { generate } from '../web/generator.js';
-import { PRESETS, presetState } from '../web/presets.js';
+import { PRESETS, PRESETS_M, presetState, presetStateM } from '../web/presets.js';
 import { buildFile, slug } from '../web/buildfile.js';
 
 const out = process.argv[2] || 'dist/buildfiles';
@@ -18,5 +18,7 @@ const write = (name, state) => {
 for (const [key, p] of Object.entries(PRESETS)) write(p.label, presetState(key));
 write('Team room rotated 30', { ...presetState('team8'), placement: { origin: [12.5, -3.2, 0], rotationDeg: 30, story: 1 } });
 write('Exec suite rotated 90', { ...presetState('exec6'), placement: { origin: [-4, 20, 0.15], rotationDeg: 90, story: 0 } });
+for (const [key, p] of Object.entries(PRESETS_M)) write(p.label, presetStateM(key));
+write('Floor L rotated 20', { ...presetStateM('floorL'), placement: { origin: [40, 10, 0], rotationDeg: 20, story: 1 } });
 write('From zone', { ...presetState('studio4'), placement: { fromZone: true, zoneName: 'Studio', origin: [3, 4, 0], rotationDeg: 0, story: 0 } });
 console.log(`Build files written to ${out}`);

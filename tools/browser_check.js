@@ -190,6 +190,87 @@ try {
   await page.waitForTimeout(200);
   await page.screenshot({ path: path.join(SHOTS, 'team8-clearances.png') });
   ok(await page.locator('#plan [data-zone="threshold"]').count() > 0, 'clearance zones drawn');
+  await page.uncheck('[data-testid="show-zones"]');
+
+  // ---------- tier M ----------
+  console.log('Tier M');
+  await setField('tier', 'M');
+  await page.waitForFunction(() => window.__layout && window.__layout.tier === 'M');
+  for (const key of ['floor36', 'floorL']) {
+    await setField('m.preset', key);
+    L = await layout();
+    ok(L.tier === 'M' && L.readouts.desksPlaced === L.readouts.desksRequested, `${key}: programme met in the browser`);
+    ok(await page.locator('#plan [data-kind="column"]').count() === L.readouts.columns, `${key}: plan shows every column`);
+    ok(await page.locator('#plan [data-kind="room"]').count() === L.readouts.roomsPlaced, `${key}: plan shows every room`);
+    ok(await page.locator('#plan [data-aisle="SPINE"]').count() === 1, `${key}: spine drawn`);
+    for (const e of L.site.edges) {
+      const segs = await page.evaluate((id) => [...document.querySelectorAll(`[data-testid^="dim-${id}-"]`)].filter((n) => !n.dataset.testid.endsWith('total')).map((n) => Number(n.dataset.value)), e.id);
+      const total = Number(await page.locator(`[data-testid="dim-${e.id}-total"]`).getAttribute('data-value'));
+      ok(total === e.length, `${key}: ${e.id} overall dimension ${total} = ${e.length}`);
+      ok(segs.every((v) => v > 0), `${key}: ${e.id} chain segments positive`);
+    }
+    for (const v of ['split', '3d', 'plan']) {
+      await page.click(`[data-testid="view-${v}"]`);
+      await page.waitForTimeout(400);
+      await page.screenshot({ path: path.join(SHOTS, `m-${key}-${v}.png`) });
+    }
+    await page.click('[data-testid="view-split"]');
+  }
+  // exact mm on an edge opening, and switching which end it is measured from
+  await setField('m.preset', 'floor36');
+  await setField('m.op.0.offset', 4321);
+  L = await layout();
+  ok(L.site.openings[0].s0 === 4321, `M: typed offset 4321 gives s0 ${L.site.openings[0].s0}`);
+  await setField('m.op.0.ref', 'end');
+  L = await layout();
+  ok(L.site.openings[0].s0 === 4321 && Number(await val('m.op.0.offset')) === 36000 - 4321 - 1800, 'M: measuring from the other end keeps the door in place');
+  // add / remove an opening
+  const nOps = L.site.openings.length;
+  await page.click('[data-testid="m-add-window"]');
+  ok((await layout()).site.openings.length === nOps + 1, 'M: add window');
+  await page.click(`[data-testid="m-remove-op-${nOps}"]`);
+  ok((await layout()).site.openings.length === nOps, 'M: remove window');
+  // shape -> L outline
+  await setField('m.shape.kind', 'L');
+  await setField('m.shape.a', 14000);
+  await setField('m.shape.b', 10000);
+  await page.click('[data-testid="m-apply-shape"]');
+  L = await layout();
+  ok(L.site.outline.length === 6, `M: L outline has 6 corners (${L.site.outline.length})`);
+  await page.screenshot({ path: path.join(SHOTS, 'm-shape-L.png') });
+  // pin a room exactly where asked
+  await setField('m.preset', 'floor36');
+  await page.click('[data-testid="m-add-pin"]');
+  const pinI = (await page.evaluate(() => window.__layout)).elements ? (await page.locator('[data-testid^="m-pin-"]').count()) - 1 : 0;
+  await setField(`m.pin.${pinI}.x`, 1000);
+  await setField(`m.pin.${pinI}.y`, 13500);
+  await setField(`m.pin.${pinI}.front`, 'E');
+  L = await layout();
+  const pinned = L.elements.find((e) => e.kind === 'room' && e.pinned);
+  ok(pinned && pinned.x0 === 1000 && pinned.y0 === 13500 && pinned.front === 'E', `M: pinned room exactly where asked ${pinned && [pinned.x0, pinned.y0, pinned.front]}`);
+  await page.screenshot({ path: path.join(SHOTS, 'm-pinned.png') });
+  // fix the floor plate; presets and strategies only change the programme
+  await page.click('[data-testid="toggle-fix"]');
+  ok(await page.locator('[data-testid="m.shape.W"]').isDisabled(), 'M: floor plate locked when fixed');
+  const siteM = JSON.stringify((await layout()).site);
+  await setField('m.preset', 'floorL');
+  ok(JSON.stringify((await layout()).site) === siteM, 'M: preset leaves a fixed floor plate alone');
+  for (const st of ['meeting', 'compact', 'daylight']) {
+    await setField('strategy', st);
+    ok(JSON.stringify((await layout()).site) === siteM, `M: strategy ${st} leaves the floor plate alone`);
+  }
+  // build file for the floor
+  const [dlm] = await Promise.all([page.waitForEvent('download'), page.click('[data-testid="download"]')]);
+  const bfm = JSON.parse(readFileSync(await dlm.path(), 'utf8'));
+  ok(bfm.model.tier === 'M' && bfm.model.beams.length === (await layout()).readouts.roomsPlaced && bfm.model.walls.some((w) => w.site === false), 'M: build file has partitions and thresholds');
+  // reload restores tier M
+  const beforeM = JSON.stringify(await layout());
+  await page.reload();
+  await page.waitForFunction(() => window.__layout);
+  ok(JSON.stringify(await layout()) === beforeM, 'M: reload restores the floor');
+  await page.click('[data-testid="toggle-fix"]');
+  await setField('tier', 'S');
+  ok((await layout()).tier === 'S', 'back to tier S');
 } catch (err) {
   failures++;
   console.log(`  FAIL exception: ${err.stack || err}`);

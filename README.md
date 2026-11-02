@@ -10,7 +10,7 @@ honest checks. Archicad building is planned as a later phase. Users should read
 |---|---|---|
 | 1 | S tier: rectangular room, fixed site, openings editor, desks along walls + meeting table + booths, 3D + plan + checks, URL/localStorage state | **done** |
 | 2 | Build file, `OfficeBuild.py` window, mock Archicad, Replace/Remove | **done against the mock**; waiting for the first real Test placement |
-| 3 | M tier: polygons, columns, core, room spine, aisles, pinned rooms | not started |
+| 3 | M tier: rectilinear floor plate, column grid, one core, spine + connector aisles, rooms packed along the spine, pinned rooms, neighbourhoods, travel distance | **done** (web + build file; Archicad side against the mock only) |
 | 4 | L tier: multiple cores, instancing, batch building | not started |
 | 5 | Library objects, multiple floors, IFC classification | not started |
 
@@ -27,6 +27,10 @@ web/presets.js           starting rooms + programmes
 web/app.js               panels, state, persistence (URL hash + localStorage)
 web/plan.js              SVG plan with dimension chains and clearance overlay
 web/view3d.js            three.js view (vendored r170 in web/vendor/)
+web/generator_m.js       tier M generator (floor plates)
+web/panels_m.js          tier M panels
+web/plan_m.js            tier M plan
+tools/check_m.js         tier M checks and stress cases (run by tools/check.js)
 tools/check.js           geometry checker: presets x tiers x strategies + stress + regressions
 tools/browser_check.js   Playwright: drives the UI, screenshots every preset/view
 tools/package.py         dist/office-configurator-<date>-<commit>.zip from HEAD
@@ -96,6 +100,22 @@ These are in `STANDARDS` in `web/generator.js`. Clearances follow the Dimensions
 Desk arrangement: **Along the walls**, **Back-to-back benches**, or **Walls, then benches**.
 Benches run at right angles to the main window wall and gather towards it (Compact: along the
 room, in the middle); a look-ahead picks positions that leave room for the remaining desks.
+
+### Tier M (floor plates)
+
+These are in `M_STANDARDS` and `ROOM_TYPES` in `web/generator_m.js`.
+
+| | |
+|---|---|
+| Spine (primary aisle) | 1800 mm, straight along the plate's long axis, clear of the core and pinned rooms; it lines up with the core's front when it can |
+| Connector aisles | 1200 mm from every entry door and the core door to the spine, routed around the core and rooms with as few turns as possible |
+| Columns in aisles | avoided where possible; otherwise reported with the clear width left |
+| Rooms | packed along the spine with their door onto it (core side first for daylight); partitions 100 mm inside the room; 900 mm door 300 mm from the corner; 1200 mm landing kept clear outside |
+| Room types | meeting (4) 3.6 x 3.0 m, meeting (8) 5.4 x 3.6 m, focus 3.0 x 2.4 m, print / storage 2.4 x 2.4 m |
+| Pinned rooms | kept exactly where asked; if they cannot be there (on the core, outside the plate, on another pin) they move to the nearest place that works and the move is reported in mm |
+| Neighbourhoods | open-plan desks on benches, handed to teams in order along the spine; each team's area is drawn per bench |
+| Travel distance | grid distance to the nearest entry door or the core door; the **45 m limit is a placeholder**, not a rule: set it for your jurisdiction |
+| Core | one rectangle with one door (treated as an exit: the stairs); 1500 mm clear in front |
 
 Strategies: **Daylight first** (booths, desks, table), **Meeting first** (table, booths, desks)
 and **Compact** (desks, booths, table). Each tries its own order first, then other orders,

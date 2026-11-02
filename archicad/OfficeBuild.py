@@ -48,7 +48,7 @@ BUILD_VERSION = 1
 BATCH = 200
 LAYER_PREFIX = "OFFICE - "
 LAYERS = ("OFFICE - Walls", "OFFICE - Rooms", "OFFICE - Workstations", "OFFICE - Meeting", "OFFICE - Storage", "OFFICE - Furniture")
-BOX_KINDS = ("desk", "chair", "table", "booth", "storage", "furniture")
+BOX_KINDS = ("desk", "chair", "table", "booth", "storage", "furniture", "structure")
 ZONE_CATEGORIES = {  # category -> (code, colour)
     "open office": ("OF-OPEN", "#d9e6f2"), "meeting": ("OF-MEET", "#f2e3c9"),
     "focus": ("OF-FOCUS", "#dcefd9"), "support": ("OF-SUP", "#e6e6e6"),
@@ -327,7 +327,7 @@ def validate_build(data):
     if m.get("units") != "m":
         errs.append("model.units: must be m")
     s = m.get("site") if isinstance(m.get("site"), dict) else {}
-    site = {"width": _num(s.get("width"), 2.4, 60, "site.width", errs), "depth": _num(s.get("depth"), 2.4, 60, "site.depth", errs),
+    site = {"width": _num(s.get("width"), 2.4, 200, "site.width", errs), "depth": _num(s.get("depth"), 2.4, 200, "site.depth", errs),
             "height": _num(s.get("height"), 2.2, 10, "site.height", errs), "wallThickness": _num(s.get("wallThickness"), 0.05, 1, "site.wallThickness", errs)}
     keys = set()
 
@@ -345,14 +345,14 @@ def validate_build(data):
 
     lim = 200.0
     walls = []
-    for i, w in enumerate(_list(m.get("walls", []), "walls", 64, errs)):
+    for i, w in enumerate(_list(m.get("walls", []), "walls", 2000, errs)):
         w = w if isinstance(w, dict) else {}
-        walls.append({"key": key(w.get("key"), f"walls[{i}].key"), "layer": layer(w.get("layer"), f"walls[{i}]"),
+        walls.append({"key": key(w.get("key"), f"walls[{i}].key"), "layer": layer(w.get("layer"), f"walls[{i}]"), "site": w.get("site", True) is not False,
                       "beg": _pt(w.get("beg"), 2, -lim, lim, f"walls[{i}].beg", errs), "end": _pt(w.get("end"), 2, -lim, lim, f"walls[{i}].end", errs),
                       "thickness": _num(w.get("thickness"), 0.05, 1, f"walls[{i}].thickness", errs), "height": _num(w.get("height"), 0.1, 10, f"walls[{i}].height", errs)})
     wall_len = {w["key"]: math.dist(w["beg"], w["end"]) for w in walls}
     openings = []
-    for i, o in enumerate(_list(m.get("openings", []), "openings", 64, errs)):
+    for i, o in enumerate(_list(m.get("openings", []), "openings", 500, errs)):
         o = o if isinstance(o, dict) else {}
         kind = o.get("kind") if o.get("kind") in ("door", "window") else None
         if kind is None:
@@ -362,19 +362,19 @@ def validate_build(data):
             errs.append(f"openings[{i}].wall: no wall {host!r}")
         rec = {"key": key(o.get("key"), f"openings[{i}].key"), "kind": kind, "wall": host, "layer": layer(o.get("layer"), f"openings[{i}]"),
                "centerOffset": _num(o.get("centerOffset"), 0, wall_len.get(host, lim), f"openings[{i}].centerOffset", errs),
-               "width": _num(o.get("width"), 0.3, 6, f"openings[{i}].width", errs), "height": _num(o.get("height"), 0.1, 10, f"openings[{i}].height", errs),
+               "width": _num(o.get("width"), 0.3, 60, f"openings[{i}].width", errs), "height": _num(o.get("height"), 0.1, 10, f"openings[{i}].height", errs),
                "sill": _num(o.get("sill", 0), 0, 10, f"openings[{i}].sill", errs),
                "swing": o.get("swing") if o.get("swing") in ("in", "out") else "in", "hinge": o.get("hinge") if o.get("hinge") in ("start", "end") else "start"}
         openings.append(rec)
     beams = []
-    for i, b in enumerate(_list(m.get("beams", []), "beams", 64, errs)):
+    for i, b in enumerate(_list(m.get("beams", []), "beams", 1000, errs)):
         b = b if isinstance(b, dict) else {}
         beams.append({"key": key(b.get("key"), f"beams[{i}].key"), "layer": layer(b.get("layer"), f"beams[{i}]"),
                       "beg": _pt(b.get("beg"), 2, -lim, lim, f"beams[{i}].beg", errs), "end": _pt(b.get("end"), 2, -lim, lim, f"beams[{i}].end", errs),
                       "width": _num(b.get("width"), 0.05, 2, f"beams[{i}].width", errs), "height": _num(b.get("height"), 0.05, 3, f"beams[{i}].height", errs),
                       "top": _num(b.get("top"), 0.1, 10, f"beams[{i}].top", errs)})
     zones = []
-    for i, z in enumerate(_list(m.get("zones", []), "zones", 32, errs)):
+    for i, z in enumerate(_list(m.get("zones", []), "zones", 500, errs)):
         z = z if isinstance(z, dict) else {}
         cat = z.get("category")
         if cat not in ZONE_CATEGORIES:
@@ -397,9 +397,10 @@ def validate_build(data):
                "kind": kind, "part": _str(b.get("part", ""), re.compile(r"^[a-z]{1,20}$"), f"boxes[{i}].part", errs, 20),
                "rot": rot, "layer": layer(b.get("layer"), f"boxes[{i}]"),
                "material": _str(b.get("material"), MATERIAL, f"boxes[{i}].material", errs, 31), "color": _str(b.get("color"), COLOR, f"boxes[{i}].color", errs, 7),
-               "min": _pt(b.get("min"), 3, -1, 61, f"boxes[{i}].min", errs), "size": _pt(b.get("size"), 3, 0.001, 12, f"boxes[{i}].size", errs)}
+               "min": _pt(b.get("min"), 3, -1, 201, f"boxes[{i}].min", errs), "size": _pt(b.get("size"), 3, 0.001, 12, f"boxes[{i}].size", errs),
+               "site": b.get("site") is True}
         if b.get("shape") == "prism":
-            rec.update({"shape": "prism", "centre": _pt(b.get("centre"), 2, -1, 61, f"boxes[{i}].centre", errs),
+            rec.update({"shape": "prism", "centre": _pt(b.get("centre"), 2, -1, 201, f"boxes[{i}].centre", errs),
                         "radius": _num(b.get("radius"), 0.05, 3, f"boxes[{i}].radius", errs),
                         "sides": int(_num(b.get("sides"), 8, 64, f"boxes[{i}].sides", errs)), "z": _pt(b.get("z"), 2, 0, 10, f"boxes[{i}].z", errs)})
         elif "shape" in b:
@@ -443,14 +444,17 @@ def summarize(build):
         if items:
             rows.append((label, len(items), ", ".join(sorted({i["layer"] for i in items}))))
 
+    site_walls = {w["key"] for w in m["walls"] if w["site"]}
     if build["walls"]:
-        add("Wall", m["walls"])
-        add("Door", [o for o in m["openings"] if o["kind"] == "door"])
-        add("Window", [o for o in m["openings"] if o["kind"] == "window"])
-        add("Beam (threshold)", m["beams"])
+        add("Wall", [w for w in m["walls"] if w["site"]])
+        add("Door", [o for o in m["openings"] if o["kind"] == "door" and o["wall"] in site_walls])
+        add("Window", [o for o in m["openings"] if o["kind"] == "window" and o["wall"] in site_walls])
+    add("Wall · partition", [w for w in m["walls"] if not w["site"]])
+    add("Door · partition", [o for o in m["openings"] if o["wall"] not in site_walls])
+    add("Beam (threshold)", m["beams"])
     add("Zone", m["zones"])
     for kind in BOX_KINDS:
-        add(f"Morph · {kind}", [b for b in m["boxes"] if b["kind"] == kind])
+        add(f"Morph · {kind}", [b for b in m["boxes"] if b["kind"] == kind and (build["walls"] or not b["site"])])
     return rows
 
 
@@ -803,7 +807,8 @@ class Builder:
             pick = select or (lambda kind, item: True)
             idf = lambda key: f"OF-{run}-{key}"
             # walls
-            walls = [w for w in m["walls"] if build["walls"] and build_walls and pick("wall", w)]
+            # site walls only when asked; room partitions always
+            walls = [w for w in m["walls"] if (not w["site"] or (build["walls"] and build_walls)) and pick("wall", w)]
             wrecs, wreqs = [], []
             for w in walls:
                 (bx, by), (ex, ey) = pl.xy(*w["beg"]), pl.xy(*w["end"])
@@ -835,10 +840,11 @@ class Builder:
                                  "expected": {"centre": [cx, cy], "dir": [math.cos(ang), math.sin(ang)]}, "check": "along"})
                 j["elements"].extend(recs)
                 self.create(command, key, reqs, recs, j)
-            if not (build["walls"] and build_walls) and m["openings"]:
-                j["notes"].append(f"{len(m['openings'])} door(s)/window(s) not built: site walls are not built in this run.")
+            skipped = [o for o in m["openings"] if o["wall"] not in wall_def]
+            if skipped:
+                j["notes"].append(f"{len(skipped)} door(s)/window(s) not built: their walls are not built in this run.")
             # thresholds: beam hung from the ceiling by its top centre
-            beams = [b for b in m["beams"] if build["walls"] and build_walls and pick("beam", b)]
+            beams = [b for b in m["beams"] if pick("beam", b)]
             breqs, brecs = [], []
             for b in beams:
                 (bx, by), (ex, ey) = pl.xy(*b["beg"]), pl.xy(*b["end"])
@@ -861,7 +867,7 @@ class Builder:
             j["elements"].extend(zrecs)
             self.create("CreateZones", "zonesData", zreqs, zrecs, j)
             # morphs
-            boxes = [b for b in m["boxes"] if pick("box", b)]
+            boxes = [b for b in m["boxes"] if (not b["site"] or (build["walls"] and build_walls)) and pick("box", b)]
             if boxes and not pl.square and any(b.get("shape") != "prism" for b in boxes):
                 self.convention = self.probe_axes(pl, j)
             mreqs, mrecs = [], []

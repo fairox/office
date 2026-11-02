@@ -128,6 +128,12 @@ export function runM({ expect, runCaseHooks }) {
       const straight = Math.min(...exits.map(([x, y]) => Math.hypot(c[0] - x, c[1] - y))) - Math.hypot(z.x1 - z.x0, z.y1 - z.y0) / 2 - 300;
       expect(name, L.travel.perDesk[d.id] >= straight - 1, `${d.id} travel ${L.travel.perDesk[d.id]} is shorter than the straight line ${Math.round(straight)}`);
     }
+    // neighbourhood areas: never over a room, the core, a column or another team's area
+    const nb = (L.neighbourhoods || []).flatMap((n) => n.rects.map((r) => ({ id: n.id, r })));
+    for (const { id, r } of nb) {
+      for (const e of E.filter((x) => ['room', 'core', 'column', 'partition'].includes(x.kind))) expect(name, !ov(r, e), `neighbourhood ${id} area ${rs(r)} overlaps ${e.id}`);
+      for (const o of nb) if (o.id !== id) expect(name, !ov(r, o.r), `neighbourhoods ${id} and ${o.id} overlap`);
+    }
     // dimension chains
     for (const [id, ch] of Object.entries(L.dims)) expect(name, ch.segments.reduce((a, b) => a + b, 0) === ch.length, `${id} chain sum`);
     if (clean) {

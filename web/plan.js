@@ -1,10 +1,12 @@
 // SVG plan: walls with openings, furniture, optional clearance zones and dimension chains.
 // Drawing units are mm; plan y is flipped so north is up.
 import { wallPoint, wallLength } from './generator.js';
+import { drawPlanM } from './plan_m.js';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 export function drawPlan(svg, layout, { showZones = false } = {}) {
+  if (layout.tier === 'M') return drawPlanM(svg, layout, { showZones });
   const { site } = layout;
   const W = site.width, D = site.depth, t = site.wall;
   const fs = Math.min(320, Math.max(130, Math.max(W, D) / 50));

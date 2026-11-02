@@ -330,6 +330,21 @@ with Mock(MA.MockArchicad(19723)) as m:
         ok(j["status"] == "built", f"{k}: {B.report_text(j)[:400]}")
     no_violations(m, "every preset")
 
+print("Tier M floor")
+fresh_home()
+with Mock(MA.MockArchicad(19723)) as m:
+    ac, info = B.connect()
+    fl = builds["floor-36-x-18-m-central-core"]
+    tested(ac, info, fl)
+    j = B.Builder(ac, info).build(fl, build_walls=False, mode="append")
+    ok(j["status"] == "built", f"floor without site walls verifies: {B.report_text(j)[:300]}")
+    keys = {r["key"] for r in j["elements"]}
+    ok(any(k.startswith("ROOM-") and "-P" in k for k in keys), "room partitions built without site walls")
+    ok(any(k.endswith("-THR") for k in keys), "room thresholds (beams) built")
+    ok(not any(k.startswith("WALL-E") for k in keys), "outline walls left out when site walls are off")
+    ok(not any(k.startswith("COL-") or k == "CORE" for k in keys), "columns and core left out when site walls are off")
+    ok(sum(1 for r in j["elements"] if r["type"] == "Zone") >= 10, "room and neighbourhood zones built")
+
 print("Zone hand-over")
 with Mock(MA.MockArchicad(19723)) as m:
     ac, info = B.connect()

@@ -3,6 +3,8 @@ import { generate, STRATEGIES, TIERS, WALLS, WALL_CORNERS, DESK_LAYOUTS, TABLE_S
 import { PRESETS, DEFAULT_PRESET, presetState } from './presets.js';
 import { drawPlan } from './plan.js';
 import { buildFile, slug } from './buildfile.js';
+import { ensureM, renderSideM, applyFieldM, actionM } from './panels_m.js';
+import { PRESETS_M } from './presets.js';
 
 const STORE_KEY = 'office-configurator/state/v1';
 const UI_KEY = 'office-configurator/ui/v1';
@@ -85,9 +87,14 @@ function openingCard(o, i, locked) {
     </div></div>`;
 }
 
-const designName = () => state.name || (PRESETS[state.preset] ? PRESETS[state.preset].label : 'Office');
+const designName = () => state.name || (state.tier === 'M' && PRESETS_M[state.presetM] ? PRESETS_M[state.presetM].label
+  : PRESETS[state.preset] ? PRESETS[state.preset].label : 'Office');
 
 function renderSide() {
+  if (state.tier === 'M') {
+    $('#side').innerHTML = renderSideM(state, layout, { num, sel, note, designName, TIERS, STRATEGIES });
+    return;
+  }
   const s = state, locked = !!s.siteFixed, r = layout.readouts;
   const pl = s.placement && s.placement.fromZone ? s.placement : null;
   const short = (a, b) => (a < b ? ' class="short"' : '');
@@ -163,6 +170,7 @@ function renderViews() {
 
 function update({ keepNote = false } = {}) {
   if (!keepNote) note = '';
+  if (state.tier === 'M') ensureM(state);
   layout = generate(state);
   window.__layout = layout; // for tools/browser_check.js
   renderSide();
@@ -181,6 +189,10 @@ function nextId(kind) {
 
 function applyField(path, raw) {
   const parts = path.split('.');
+  if (parts[0] === 'm') {
+    note = applyFieldM(state, path, raw);
+    return !!note;
+  }
   if (path === 'preset') {
     const p = presetState(raw, state.strategy);
     if (state.siteFixed) {
@@ -240,6 +252,11 @@ document.addEventListener('click', (ev) => {
   const a = b.dataset.action;
   if (!a) return;
   if (a === 'toggle-fix') state.siteFixed = !state.siteFixed;
+  if (a.startsWith('m-')) {
+    note = actionM(state, a, Number(b.dataset.index));
+    update({ keepNote: !!note });
+    return;
+  }
   if (a === 'add-door' || a === 'add-window') {
     const kind = a === 'add-door' ? 'door' : 'window';
     state.site.openings.push(kind === 'door'

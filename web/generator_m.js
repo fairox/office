@@ -890,7 +890,12 @@ export function generateM(state, report, strategy) {
 
   // neighbourhoods: open-plan desks in order along the spine, split by the teams' sizes
   const axis = spine && !spine.horiz ? 1 : 0;
-  const open = elements.filter((e) => e.kind === 'desk' && !e.room).sort((a, b) => (axis ? a.y0 - b.y0 || a.x0 - b.x0 : a.x0 - b.x0 || a.y0 - b.y0));
+  // benches in order along the spine; inside a bench, desk pairs along its length, so a team boundary cuts across it
+  const benchAt = {};
+  for (const it of ctx.items) if (it.kind === 'bench') benchAt[it.id] = it;
+  const bkey = (d) => { const b = benchAt[d.bench], c = centre(b.rect); return axis ? c[1] * 1e6 + c[0] : c[0] * 1e6 + c[1]; };
+  const along = (d) => (benchAt[d.bench].rot === 0 ? d.x0 * 1e6 + d.y0 : d.y0 * 1e6 + d.x0);
+  const open = elements.filter((e) => e.kind === 'desk' && !e.room).sort((a, b) => bkey(a) - bkey(b) || along(a) - along(b));
   const neighbourhoods = [];
   let k = 0;
   nbs.forEach((n, i) => {
@@ -898,9 +903,17 @@ export function generateM(state, report, strategy) {
     k += mine.length;
     mine.forEach((d) => { d.neighbourhood = `NBH-${i + 1}`; });
     if (mine.length) {
-      const all = mine.flatMap((d) => [d, ...(d.access || [])]);
-      neighbourhoods.push({ id: `NBH-${i + 1}`, name: n.name, desks: mine.map((d) => d.id), requested: n.desks,
-        rect: R(Math.min(...all.map((r) => r.x0)), Math.min(...all.map((r) => r.y0)), Math.max(...all.map((r) => r.x1)), Math.max(...all.map((r) => r.y1))) });
+      // one area per bench (its desks and chair zones), so a team never claims the floor between its benches
+      const bound = (list) => R(Math.min(...list.map((r) => r.x0)), Math.min(...list.map((r) => r.y0)), Math.max(...list.map((r) => r.x1)), Math.max(...list.map((r) => r.y1)));
+      const byBench = {};
+      for (const d of mine) (byBench[d.bench] = byBench[d.bench] || []).push(d, ...(d.access || []));
+      const others = open.filter((d) => !mine.includes(d)).flatMap((d) => [d, ...(d.access || [])]);
+      // where a bench is shared with another team, its part is drawn desk by desk
+      const rects = Object.entries(byBench).flatMap(([, list]) => {
+        const b = bound(list);
+        return others.some((o) => overlaps(b, o)) ? mine.filter((d) => list.includes(d)).map((d) => bound([d, ...(d.access || [])])) : [b];
+      });
+      neighbourhoods.push({ id: `NBH-${i + 1}`, name: n.name, desks: mine.map((d) => d.id), requested: n.desks, rects, rect: bound(rects) });
     }
     if (mine.length < n.desks) report('warn', 'programme.neighbourhood', `${n.name}: ${mine.length} of ${n.desks} desks placed; ${n.desks - mine.length} short.`, { amount: n.desks - mine.length });
   });
